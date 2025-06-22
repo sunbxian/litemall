@@ -5,7 +5,10 @@ var user = require('../../../utils/user.js');
 var app = getApp();
 Page({
   data: {
-    canIUseGetUserProfile: false,
+    canIUseGetUserProfile: true,
+    wxLoading: false,       // 微信登录加载状态
+    accountLoading: false    // 账号登录加载状态
+    
   },
   onLoad: function(options) {
     // 页面初始化 options为页面跳转所带来的参数
@@ -31,13 +34,20 @@ Page({
 
   },
   wxLogin: function(e) {
+    if (this.data.wxLoading) return; // 防止重复点击
+    
+    this.setData({
+      wxLoading: true
+    });
+    
     if (this.data.canIUseGetUserProfile) {
       wx.getUserProfile({
-        desc: '用于完善会员资料', // 声明获取用户个人信息后的用途，后续会展示在弹窗中，请谨慎填写
+        desc: '用于完善会员资料',
         success: (res) => {
           this.doLogin(res.userInfo)
         },
         fail: () => {
+          this.setData({ wxLoading: false });
           util.showErrorToast('微信登录失败');
         }
       })
@@ -45,24 +55,27 @@ Page({
     else {
       if (e.detail.userInfo == undefined) {
         app.globalData.hasLogin = false;
+        this.setData({ wxLoading: false });
         util.showErrorToast('微信登录失败');
         return;
       }
       this.doLogin(e.detail.userInfo)
     }
   },
+
   doLogin: function(userInfo) {
     user.checkLogin().catch(() => {
       user.loginByWeixin(userInfo).then(res => {
         app.globalData.hasLogin = true;
+        this.setData({ wxLoading: false });
         wx.navigateBack({
           delta: 1
         })
       }).catch((err) => {
         app.globalData.hasLogin = false;
+        this.setData({ wxLoading: false });
         util.showErrorToast('微信登录失败');
       });
-
     });
   },
   accountLogin: function() {

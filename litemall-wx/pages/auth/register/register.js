@@ -8,7 +8,9 @@ Page({
     password: '',
     confirmPassword: '',
     mobile: '',
-    code: ''
+    code: '',
+    countdown: 0, // 添加倒计时状态
+    countdownText: '获取验证码' // 添加倒计时文本
   },
   onLoad: function(options) {
     // 页面初始化 options为页面跳转所带来的参数
@@ -24,14 +26,27 @@ Page({
   },
   onHide: function() {
     // 页面隐藏
-
+    // 清除定时器
+    if (this.timer) {
+      clearInterval(this.timer);
+      this.timer = null;
+    }
   },
   onUnload: function() {
     // 页面关闭
-
+    // 清除定时器
+    if (this.timer) {
+      clearInterval(this.timer);
+      this.timer = null;
+    }
   },
   sendCode: function() {
     let that = this;
+
+    // 如果倒计时未结束，不允许再次发送
+    if (this.data.countdown > 0) {
+      return;
+    }
 
     if (this.data.mobile.length == 0) {
       wx.showModal({
@@ -53,6 +68,9 @@ Page({
       },
       success: function(res) {
         if (res.data.errno == 0) {
+          // 开始倒计时
+          that.startCountdown();
+          
           wx.showModal({
             title: '发送成功',
             content: '验证码已发送',
@@ -65,8 +83,43 @@ Page({
             showCancel: false
           });
         }
+      },
+      fail: function() {
+        wx.showModal({
+          title: '错误信息',
+          content: '网络请求失败，请重试',
+          showCancel: false
+        });
       }
     });
+  },
+    
+  startCountdown: function() {
+    let that = this;
+    let countdown = 60;
+    
+    this.setData({
+      countdown: countdown,
+      countdownText: countdown + '秒后重试'
+    });
+    
+    this.timer = setInterval(function() {
+      countdown--;
+      
+      if (countdown <= 0) {
+        clearInterval(that.timer);
+        that.timer = null;
+        that.setData({
+          countdown: 0,
+          countdownText: '获取验证码'
+        });
+      } else {
+        that.setData({
+          countdown: countdown,
+          countdownText: countdown + '秒后重试'
+        });
+      }
+    }, 1000);
   },
   requestRegister: function(wxCode) {
     let that = this;

@@ -59,3 +59,15 @@
   letter-spacing: 3rpx;
   background-image: linear-gradient(to right, #9a9ba1 0%, #9a9ba1 100%);
 }
+
+.loading-icon {
+  width: 40rpx;
+  height: 40rpx;
+  margin-left: 10rpx;
+}
+
+.loading-text {
+  color: #fff;
+  display: inline-block;
+  vertical-align: middle;
+}

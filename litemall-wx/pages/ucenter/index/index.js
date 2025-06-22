@@ -56,6 +56,10 @@ Page({
       wx.navigateTo({
         url: "/pages/auth/login/login"
       });
+    } else {
+      wx.navigateTo({
+        url: "/pages/ucenter/userInfo/userInfo"
+      });
     }
   },
   goOrder() {

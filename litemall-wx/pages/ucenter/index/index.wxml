@@ -3,6 +3,7 @@
     <image class="avatar" src="{{userInfo.avatarUrl}}"></image>
     <view class="info">
       <text class="name">{{userInfo.nickName}}</text>
+     <text class="name" style="font-size: 14px;">ID: {{userInfo.userName}}</text>
     </view>
   </view>
 

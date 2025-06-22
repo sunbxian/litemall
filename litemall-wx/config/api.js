@@ -4,7 +4,7 @@ var WxApiRoot = 'http://localhost:8080/wx/';
 // 局域网测试使用
 // var WxApiRoot = 'http://192.168.1.3:8080/wx/';
 // 云平台部署时使用
-// var WxApiRoot = 'http://122.51.199.160:8080/wx/';
+// var WxApiRoot = 'http://8.155.60.106:8080/wx/';
 // 云平台上线时使用
 // var WxApiRoot = 'https://www.menethil.com.cn/wx/';
 
@@ -22,7 +22,9 @@ module.exports = {
   AuthReset: WxApiRoot + 'auth/reset', //账号密码重置
   AuthRegisterCaptcha: WxApiRoot + 'auth/regCaptcha', //验证码
   AuthBindPhone: WxApiRoot + 'auth/bindPhone', //绑定微信手机号
-
+  AuthInfo: WxApiRoot + 'auth/info', //用户信息
+  AuthProfile: WxApiRoot + 'auth/profile', //账号修改
+ 
   GoodsCount: WxApiRoot + 'goods/count', //统计商品总数
   GoodsList: WxApiRoot + 'goods/list', //获得商品列表
   GoodsCategory: WxApiRoot + 'goods/category', //获得分类数据

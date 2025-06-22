@@ -1,0 +1,54 @@
+<view class="container">
+  <form bindsubmit="formSubmit">
+    <!-- 头像 -->
+    <view class="form-item">
+      <text class="label">头像</text>
+      <view class="avatar-upload" bindtap="chooseAvatar">
+        <image class="avatar" src="{{avatar}}" mode="aspectFill"></image> 
+      </view>
+    </view>
+    
+    <!-- 昵称 -->
+    <view class="form-item">
+      <text class="label">昵称</text>
+      <input 
+        class="input" 
+        name="nickName" 
+        placeholder="请输入昵称" 
+        value="{{nickName}}"
+        maxlength="20"
+      />
+    </view>
+    
+    <!-- 性别 -->
+    <view class="form-item">
+      <text class="label">性别</text>
+      <picker 
+        class="picker" 
+        mode="selector" 
+        range="{{genderList}}" 
+        range-key="name"
+        value="{{genderIndex}}"
+        bindchange="genderChange"
+      >
+        <view class="picker-text">{{genderList[genderIndex].name}}</view>
+      </picker>
+    </view>
+    
+    <!-- 手机号 -->
+    <!-- <view class="form-item">
+      <text class="label">手机号</text>
+      <input 
+        class="input" 
+        name="mobile" 
+        placeholder="请输入手机号" 
+        type="number"
+        value="{{mobile}}"
+        maxlength="11"
+      />
+    </view> -->
+    
+    <!-- 提交按钮 -->
+    <button class="submit-btn" formType="submit" type="primary">保存</button>
+  </form>
+</view>

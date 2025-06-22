@@ -1,7 +1,17 @@
-<view class="container">
+<view class="container"> 
   <view class="login-box">
-    <button wx:if="{{canIUseGetUserProfile}}" type="primary" class="wx-login-btn" bindtap="wxLogin">微信直接登录</button>  
-    <button wx:else type="primary" open-type="getUserProfile" class="wx-login-btn" open-type="getUserInfo" bindgetuserinfo="wxLogin">微信直接登录</button>
+    <button wx:if="{{canIUseGetUserProfile}}" type="primary" class="wx-login-btn" bindtap="wxLogin" disabled="{{wxLoading}}">
+      <block wx:if="{{!wxLoading}}">微信直接登录</block>
+      <block wx:else>
+        <text class="loading-text">登录中...</text> 
+      </block>
+    </button>  
+    <button wx:else type="primary" class="wx-login-btn" open-type="getUserProfile" bindgetuserinfo="wxLogin" disabled="{{wxLoading}}">
+      <block wx:if="{{!wxLoading}}">微信直接登录</block>
+      <block wx:else>
+        <text class="loading-text">登录中...</text> 
+      </block>
+    </button>
     <button type="primary" class="account-login-btn" bindtap="accountLogin">账号登录</button>
   </view>
 </view>
