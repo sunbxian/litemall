@@ -22,6 +22,7 @@ public class OrderVo {
     private String shipChannel;
     private String shipSn;
     private String message;
+    private String grabName;
     private LocalDateTime payTime;
     private List<OrderGoodsVo> goodsVoList;
 
@@ -169,6 +170,14 @@ public class OrderVo {
         this.mobile = mobile;
     }
 
+    public String getGrabName() {
+        return grabName;
+    }
+
+    public void setGrabName(String grabName) {
+        this.grabName = grabName;
+    }
+
     public List<OrderGoodsVo> getGoodsVoList() {
         return goodsVoList;
     }
@@ -197,6 +206,7 @@ public class OrderVo {
                 ", shipChannel='" + shipChannel + '\'' +
                 ", shipSn='" + shipSn + '\'' +
                 ", message='" + message + '\'' +
+                ", grabName='" + grabName + '\'' +
                 ", payTime=" + payTime +
                 ", goodsVoList=" + goodsVoList +
                 '}';

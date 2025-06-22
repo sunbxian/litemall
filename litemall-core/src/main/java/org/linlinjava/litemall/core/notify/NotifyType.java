@@ -2,6 +2,7 @@ package org.linlinjava.litemall.core.notify;
 
 public enum NotifyType {
     PAY_SUCCEED("paySucceed"),
+    WATER("water"),
     SHIP("ship"),
     REFUND("refund"),
     CAPTCHA("captcha");

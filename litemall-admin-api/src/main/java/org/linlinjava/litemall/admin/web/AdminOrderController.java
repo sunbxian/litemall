@@ -92,6 +92,19 @@ public class AdminOrderController {
     }
 
     /**
+     * 送水
+     *
+     * @param body 订单信息，{ orderId：xxx, grabUserId: xxxx }
+     * @return 订单操作结果
+     */
+    @RequiresPermissions("admin:order:water")
+    @RequiresPermissionsDesc(menu = {"商场管理", "订单管理"}, button = "订单送水")
+    @PostMapping("/water")
+    public Object water(@RequestBody String body) {
+        return adminOrderService.water(body);
+    }
+
+    /**
      * 发货
      *
      * @param body 订单信息，{ orderId：xxx, shipSn: xxx, shipChannel: xxx }

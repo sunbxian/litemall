@@ -58,6 +58,9 @@
             <if test="order.payTime != null">
                 pay_time = #{order.payTime,jdbcType=TIMESTAMP},
             </if>
+            <if test="order.grabUserId != null">
+                grab_user_id = #{order.grabUserId,jdbcType=INTEGER},
+            </if>
             <if test="order.shipSn != null">
                 ship_sn = #{order.shipSn,jdbcType=VARCHAR},
             </if>
@@ -137,6 +140,7 @@
         <result column="user_id" property="userId"/>
         <result column="user_name" property="userName"/>
         <result column="user_avatar" property="userAvatar"/>
+        <result column="grab_name" property="grabName"/>
 
         <collection property="goodsVoList" ofType="org.linlinjava.litemall.db.domain.OrderGoodsVo">
             <id column="ogid" property="id"/>
@@ -152,7 +156,7 @@
     <select id="getOrderList" resultMap="orderList">
         select o.id, o.order_sn, o.order_status, o.actual_price, o.freight_price, o.add_time, o.message,
         o.consignee, o.address, o.mobile, o.pay_time, o.order_price, o.ship_channel, o.ship_sn,
-        u.id user_id, u.nickname user_name, u.avatar user_avatar, o.integral_price,
+        u.id user_id, u.nickname user_name, u.avatar user_avatar, o.integral_price, u2.nickname grab_name,
         og.id ogid, og.goods_id, og.product_id, og.goods_name, og.pic_url goods_picture,
         og.specifications goods_specifications, og.number goods_number, og.price goods_price
         from litemall_order o
@@ -162,6 +166,8 @@
         on o.id = og.order_id
         left join litemall_goods g
         on og.goods_id = g.id
+        left join litemall_user u2
+        on o.grab_user_id =  u2.id
         <where>
             <if test="query != null">
                 ${query}

@@ -182,6 +182,52 @@ public class AdminOrderService {
     }
 
     /**
+     * 送水
+     * 1. 检测当前订单是否能够送水
+     * 2. 设置订单发货状态
+     *
+     * @param body 订单信息，{ orderId：xxx, grabUserId: xxx }
+     * @return 订单操作结果
+     * 成功则 { errno: 0, errmsg: '成功' }
+     * 失败则 { errno: XXX, errmsg: XXX }
+     */
+    public Object water(String body) {
+        Integer orderId = JacksonUtil.parseInteger(body, "orderId");
+        Integer grabUserId = JacksonUtil.parseInteger(body, "grabUserId");
+        String grabName = JacksonUtil.parseString(body, "grabName");
+        String grabPhone = JacksonUtil.parseString(body, "grabPhone");
+
+        if (orderId == null || grabUserId == null) {
+            return ResponseUtil.badArgument();
+        }
+
+        LitemallOrder order = orderService.findById(orderId);
+        if (order == null) {
+            return ResponseUtil.badArgument();
+        }
+
+        // 如果订单不是已付款状态，则不能送水
+        if (!order.getOrderStatus().equals(OrderUtil.STATUS_PAY)) {
+            return ResponseUtil.fail(ORDER_CONFIRM_NOT_ALLOWED, "订单不能送水");
+        }
+
+        order.setOrderStatus(OrderUtil.STATUS_SHIP);
+        order.setGrabUserId(grabUserId);
+        order.setShipTime(LocalDateTime.now());
+        if (orderService.updateWithOptimisticLocker(order) == 0) {
+            return ResponseUtil.updatedDateExpired();
+        }
+
+        //TODO 发送邮件和短信通知，这里采用异步发送
+        // 送水会发送通知短信给用户:          *
+        // "您的订单已经发货，送水员 {1}，电话 {2} ，请注意查收"
+        notifyService.notifySmsTemplate(order.getMobile(), NotifyType.WATER, new String[]{grabName, grabPhone});
+
+        logHelper.logOrderSucceed("送水", "订单编号 " + order.getOrderSn());
+        return ResponseUtil.ok();
+    }
+
+    /**
      * 发货
      * 1. 检测当前订单是否能够发货
      * 2. 设置订单发货状态

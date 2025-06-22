@@ -130,6 +130,7 @@ export default {
       gender: 'Gender',
       birthday: 'Birthday',
       user_level: 'Level',
+      role: 'Role',
       status: 'Status',
       actions: 'Actions'
     },
@@ -142,6 +143,7 @@ export default {
       mobile: 'Mobile',
       gender: 'Gender',
       user_level: 'Level',
+      role: 'Role',
       status: 'Status'
     },
     placeholder: {
@@ -150,6 +152,7 @@ export default {
       filter_mobile: 'Mobile',
       gender: 'Please choose',
       user_level: 'Please choose',
+      role: 'Please choose',
       status: 'Please choose'
     }
   },
@@ -305,6 +308,7 @@ export default {
       pay_time: 'Time paid',
       consignee: 'Consignee',
       mobile: 'Mobile',
+      grabName: 'Grab name',
       ship_sn: 'Ship SN',
       ship_channel: 'Ship channel',
       actions: 'Actions',
@@ -338,6 +342,8 @@ export default {
       detail_receipt_info: 'Receipt info',
       pay_old_money: 'Order amount',
       pay_new_money: 'Payment amount',
+      water_name: 'Grab name',
+      water_phone: 'Grab phone',
       ship_channel: 'Ship company',
       ship_sn: 'Ship SN',
       refund_money: 'Refund amount'
@@ -349,7 +355,8 @@ export default {
       filter_time_start: 'From date',
       filter_time_end: 'To date',
       filter_order_status: 'Status',
-      ship_channel: 'Please choose'
+      ship_channel: 'Please choose',
+      search_user: 'Search water'
     },
     message: {
       pay_confirm: 'Confirm that the current order (order number {order_sn}) has been paid offline?'
@@ -357,6 +364,7 @@ export default {
     button: {
       pay: 'Pay',
       ship: 'Ship',
+      water: 'Water',
       refund: 'Refund',
       detail_cancel: 'Cancel',
       detail_print: 'Print'

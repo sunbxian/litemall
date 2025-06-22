@@ -46,15 +46,21 @@ public class LitemallUserService {
         return userMapper.updateByPrimaryKeySelective(user);
     }
 
-    public List<LitemallUser> querySelective(String username, String mobile, Integer page, Integer size, String sort, String order) {
+    public List<LitemallUser> querySelective(String username, String nickname, String mobile, String role, Integer page, Integer size, String sort, String order) {
         LitemallUserExample example = new LitemallUserExample();
         LitemallUserExample.Criteria criteria = example.createCriteria();
 
         if (!StringUtils.isEmpty(username)) {
             criteria.andUsernameLike("%" + username + "%");
         }
+        if (!StringUtils.isEmpty(nickname)) {
+            criteria.andNicknameLike("%" + nickname + "%");
+        }
         if (!StringUtils.isEmpty(mobile)) {
             criteria.andMobileEqualTo(mobile);
+        }
+        if (!StringUtils.isEmpty(role)) {
+            criteria.andRoleEqualTo(role);
         }
         criteria.andDeletedEqualTo(false);
 

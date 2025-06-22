@@ -3,25 +3,21 @@ package org.linlinjava.litemall.wx.web;
 import cn.binarywang.wx.miniapp.api.WxMaService;
 import cn.binarywang.wx.miniapp.bean.WxMaJscode2SessionResult;
 import cn.binarywang.wx.miniapp.bean.WxMaPhoneNumberInfo;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.linlinjava.litemall.core.notify.NotifyService;
 import org.linlinjava.litemall.core.notify.NotifyType;
-import org.linlinjava.litemall.core.util.CharUtil;
-import org.linlinjava.litemall.core.util.JacksonUtil;
-import org.linlinjava.litemall.core.util.RegexUtil;
-import org.linlinjava.litemall.core.util.ResponseUtil;
+import org.linlinjava.litemall.core.util.*;
 import org.linlinjava.litemall.core.util.bcrypt.BCryptPasswordEncoder;
 import org.linlinjava.litemall.db.domain.LitemallUser;
 import org.linlinjava.litemall.db.service.CouponAssignService;
 import org.linlinjava.litemall.db.service.LitemallUserService;
 import org.linlinjava.litemall.wx.annotation.LoginUser;
 import org.linlinjava.litemall.wx.dto.UserInfo;
-import org.linlinjava.litemall.wx.dto.UserToken;
 import org.linlinjava.litemall.wx.dto.WxLoginInfo;
 import org.linlinjava.litemall.wx.service.CaptchaCodeManager;
 import org.linlinjava.litemall.wx.service.UserTokenManager;
-import org.linlinjava.litemall.core.util.IpUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
@@ -138,8 +134,13 @@ public class WxAuthController {
 
         LitemallUser user = userService.queryByOid(openId);
         if (user == null) {
+            String username;
+            do {
+                username = RandomStringUtils.randomAlphanumeric(7);
+            } while (!userService.queryByUsername(username).isEmpty());
+
             user = new LitemallUser();
-            user.setUsername(openId);
+            user.setUsername(username);
             user.setPassword(openId);
             user.setWeixinOpenid(openId);
             user.setAvatar(userInfo.getAvatarUrl());
@@ -176,7 +177,7 @@ public class WxAuthController {
 
     /**
      * 请求注册验证码
-     *
+     * <p>
      * TODO
      * 这里需要一定机制防止短信验证码被滥用
      *
@@ -268,7 +269,7 @@ public class WxAuthController {
         String openId = "";
         // 非空，则是小程序注册
         // 继续验证openid
-        if(!StringUtils.isEmpty(wxCode)) {
+        if (!StringUtils.isEmpty(wxCode)) {
             try {
                 WxMaJscode2SessionResult result = this.wxService.getUserService().getSessionInfo(wxCode);
                 openId = result.getOpenid();
@@ -326,7 +327,7 @@ public class WxAuthController {
 
     /**
      * 请求验证码
-     *
+     * <p>
      * TODO
      * 这里需要一定机制防止短信验证码被滥用
      *
@@ -335,7 +336,7 @@ public class WxAuthController {
      */
     @PostMapping("captcha")
     public Object captcha(@LoginUser Integer userId, @RequestBody String body) {
-        if(userId == null){
+        if (userId == null) {
             return ResponseUtil.unlogin();
         }
         String phoneNumber = JacksonUtil.parseString(body, "mobile");
@@ -431,7 +432,7 @@ public class WxAuthController {
      */
     @PostMapping("resetPhone")
     public Object resetPhone(@LoginUser Integer userId, @RequestBody String body, HttpServletRequest request) {
-        if(userId == null){
+        if (userId == null) {
             return ResponseUtil.unlogin();
         }
         String password = JacksonUtil.parseString(body, "password");
@@ -484,7 +485,7 @@ public class WxAuthController {
      */
     @PostMapping("profile")
     public Object profile(@LoginUser Integer userId, @RequestBody String body, HttpServletRequest request) {
-        if(userId == null){
+        if (userId == null) {
             return ResponseUtil.unlogin();
         }
         String avatar = JacksonUtil.parseString(body, "avatar");
@@ -492,13 +493,13 @@ public class WxAuthController {
         String nickname = JacksonUtil.parseString(body, "nickname");
 
         LitemallUser user = userService.findById(userId);
-        if(!StringUtils.isEmpty(avatar)){
+        if (!StringUtils.isEmpty(avatar)) {
             user.setAvatar(avatar);
         }
-        if(gender != null){
+        if (gender != null) {
             user.setGender(gender);
         }
-        if(!StringUtils.isEmpty(nickname)){
+        if (!StringUtils.isEmpty(nickname)) {
             user.setNickname(nickname);
         }
 
@@ -518,10 +519,10 @@ public class WxAuthController {
      */
     @PostMapping("bindPhone")
     public Object bindPhone(@LoginUser Integer userId, @RequestBody String body) {
-    	if (userId == null) {
+        if (userId == null) {
             return ResponseUtil.unlogin();
         }
-    	LitemallUser user = userService.findById(userId);
+        LitemallUser user = userService.findById(userId);
         String encryptedData = JacksonUtil.parseString(body, "encryptedData");
         String iv = JacksonUtil.parseString(body, "iv");
         WxMaPhoneNumberInfo phoneNumberInfo = this.wxService.getUserService().getPhoneNoInfo(user.getSessionKey(), encryptedData, iv);

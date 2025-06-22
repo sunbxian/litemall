@@ -85,16 +85,18 @@
 
       <el-table-column align="center" :label="$t('mall_order.table.mobile')" prop="mobile" min-width="100" />
 
-      <el-table-column align="center" :label="$t('mall_order.table.ship_sn')" prop="shipSn" />
+      <el-table-column align="center" :label="$t('mall_order.table.grabName')" prop="grabName" min-width="100" />
+      <!--      <el-table-column align="center" :label="$t('mall_order.table.ship_sn')" prop="shipSn" />-->
 
-      <el-table-column align="center" :label="$t('mall_order.table.ship_channel')" prop="shipChannel" />
+      <!--      <el-table-column align="center" :label="$t('mall_order.table.ship_channel')" prop="shipChannel" />-->
 
       <el-table-column align="center" :label="$t('mall_order.table.actions')" width="250" class-name="oper">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" @click="handleDetail(scope.row)">{{ $t('app.button.detail') }}</el-button>
           <el-button type="danger" size="mini" @click="handleDelete(scope.row)">{{ $t('app.button.delete') }}</el-button>
           <el-button type="warning" size="mini" @click="handlePay(scope.row)">{{ $t('mall_order.button.pay') }}</el-button>
-          <el-button type="primary" size="mini" @click="handleShip(scope.row)">{{ $t('mall_order.button.ship') }}</el-button>
+          <el-button type="primary" size="mini" @click="handleWater(scope.row)">{{ $t('mall_order.button.water') }}</el-button>
+          <!--          <el-button type="primary" size="mini" @click="handleShip(scope.row)">{{ $t('mall_order.button.ship') }}</el-button>-->
           <el-button type="danger" size="mini" @click="handleRefund(scope.row)">{{ $t('mall_order.button.refund') }}</el-button>
         </template>
       </el-table-column>
@@ -207,6 +209,42 @@
       </div>
     </el-dialog>
 
+    <!-- 送水对话框 -->
+    <el-dialog :visible.sync="waterDialogVisible" :title="$t('mall_order.dialog.water')">
+      <el-form ref="waterForm" :model="waterForm" status-icon label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
+        <el-form-item :label="$t('mall_order.form.water_name')" prop="grabUserId">
+          <el-select
+            v-model="waterForm.grabName"
+            filterable
+            remote
+            reserve-keyword
+            :remote-method="searchUsers"
+            :loading="userSearchLoading"
+            :placeholder="$t('mall_order.placeholder.search_user')"
+            @focus="handleSelectFocus"
+            @change="handleUserChange"
+          >
+            <el-option
+              v-for="user in userOptions"
+              :key="user.id"
+              :label="user.nickname"
+              :value="user"
+            >
+              <span style="float: left">{{ user.nickname }}</span>
+              <span style="float: right; color: #8492a6; font-size: 13px">{{ user.mobile }}</span>
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item :label="$t('mall_order.form.water_phone')" prop="grabPhone">
+          <el-input v-model="waterForm.grabPhone" :disabled="true" />
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="waterDialogVisible = false">{{ $t('app.button.cancel') }}</el-button>
+        <el-button type="primary" @click="confirmWater">{{ $t('app.button.confirm') }}</el-button>
+      </div>
+    </el-dialog>
+
     <!-- 发货对话框 -->
     <el-dialog :visible.sync="shipDialogVisible" :title="$t('mall_order.dialog.ship')">
       <el-form ref="shipForm" :model="shipForm" status-icon label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
@@ -287,9 +325,19 @@
 </style>
 
 <script>
-import { detailOrder, listOrder, listChannel, refundOrder, payOrder, deleteOrder, shipOrder } from '@/api/order'
+import {
+  detailOrder,
+  listOrder,
+  listChannel,
+  refundOrder,
+  payOrder,
+  deleteOrder,
+  shipOrder,
+  waterOrder
+} from '@/api/order'
 import Pagination from '@/components/Pagination' // Secondary package based on el-pagination
-import checkPermission from '@/utils/permission' // 权限判断函数
+import checkPermission from '@/utils/permission'
+import { fetchList } from '@/api/user' // 权限判断函数
 
 const statusMap = {
   101: '未付款',
@@ -361,6 +409,15 @@ export default {
         user: {},
         orderGoods: []
       },
+      waterForm: {
+        orderId: undefined,
+        grabUserId: undefined,
+        grabName: '',
+        grabPhone: ''
+      },
+      userOptions: [],
+      userSearchLoading: false,
+      waterDialogVisible: false,
       shipForm: {
         orderId: undefined,
         shipChannel: undefined,
@@ -476,6 +533,71 @@ export default {
         })
       }).finally(() => {
         this.payDialogVisible = false
+      })
+    },
+    handleSelectFocus() {
+      // Trigger search with empty query to load recent/default users
+      this.searchUsers('')
+    },
+
+    handleUserChange(selectedUser) {
+      if (selectedUser) {
+        this.waterForm.grabUserId = selectedUser.id
+        this.waterForm.grabName = selectedUser.nickname
+        this.waterForm.grabPhone = selectedUser.mobile
+      } else {
+        this.waterForm.grabUserId = null
+        this.waterForm.grabName = ''
+        this.waterForm.grabPhone = ''
+      }
+    },
+    searchUsers(query) {
+      const userListQuery = {
+        page: 1,
+        limit: 20,
+        nickname: query,
+        role: 'grabber',
+        sort: 'add_time',
+        order: 'desc'
+      }
+
+      this.userSearchLoading = true
+      fetchList(userListQuery).then(response => {
+        this.userOptions = response.data.data.list
+        this.userSearchLoading = false
+      }).catch(() => {
+        this.userOptions = []
+        this.userSearchLoading = false
+      })
+    },
+    handleWater(row) {
+      this.waterForm.orderId = row.id
+      this.waterForm.grabUserId = row.grabUserId
+      this.waterForm.grabName = row.grabName
+      this.waterForm.grabPhone = row.grabPhone
+
+      this.waterDialogVisible = true
+      this.$nextTick(() => {
+        this.$refs['waterForm'].clearValidate()
+      })
+    },
+    confirmWater() {
+      this.$refs['waterForm'].validate((valid) => {
+        if (valid) {
+          waterOrder(this.waterForm).then(response => {
+            this.waterDialogVisible = false
+            this.$notify.success({
+              title: '成功',
+              message: '确认送水成功'
+            })
+            this.getList()
+          }).catch(response => {
+            this.$notify.error({
+              title: '失败',
+              message: response.data.errmsg
+            })
+          })
+        }
       })
     },
     handleShip(row) {

@@ -20,6 +20,14 @@ export function detailOrder(id) {
   })
 }
 
+export function waterOrder(data) {
+  return request({
+    url: '/order/water',
+    method: 'post',
+    data
+  })
+}
+
 export function shipOrder(data) {
   return request({
     url: '/order/ship',
