@@ -19,14 +19,14 @@ then
 fi
 
 # 导入数据
-cd /home/ubuntu/deploy/db || exit 2
+cd /srv/yldsw/deploy/db || exit 2
 mysql -h localhost -u $ROOT -p$PASSWORD < litemall.sql
 
 # 删除storage文件夹内文件
-cd /home/ubuntu/deploy/litemall/storage || exit 2
+cd /srv/yldsw/deploy/litemall/storage || exit 2
 rm -f ./**
 
 # 重新部署服务
-cd /home/ubuntu/deploy/bin || exit 2
+cd /srv/yldsw/deploy/bin || exit 2
 sudo ./stop.sh
 sudo ./deploy.sh
