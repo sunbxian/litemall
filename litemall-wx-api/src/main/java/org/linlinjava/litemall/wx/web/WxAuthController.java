@@ -91,7 +91,8 @@ public class WxAuthController {
 
         // userInfo
         UserInfo userInfo = new UserInfo();
-        userInfo.setNickName(username);
+        userInfo.setNickName(user.getNickname());
+        userInfo.setUserName(username);
         userInfo.setAvatarUrl(user.getAvatar());
 
         // token
@@ -156,6 +157,8 @@ public class WxAuthController {
 
             // 新用户发送注册优惠券
             couponAssignService.assignForRegister(user.getId());
+
+            userInfo.setUserName(username);
         } else {
             user.setLastLoginTime(LocalDateTime.now());
             user.setLastLoginIp(IpUtil.getIpAddr(request));
@@ -163,6 +166,10 @@ public class WxAuthController {
             if (userService.updateById(user) == 0) {
                 return ResponseUtil.updatedDataFailed();
             }
+
+            userInfo.setUserName(user.getUsername());
+            userInfo.setNickName(user.getNickname());
+            userInfo.setAvatarUrl(user.getAvatar());
         }
 
         // token

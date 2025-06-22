@@ -1,6 +1,7 @@
 package org.linlinjava.litemall.wx.dto;
 
 public class UserInfo {
+    private String userName;
     private String nickName;
     private String avatarUrl;
     private String country;
@@ -8,6 +9,14 @@ public class UserInfo {
     private String city;
     private String language;
     private Byte gender;
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
 
     public String getCountry() {
         return country;
