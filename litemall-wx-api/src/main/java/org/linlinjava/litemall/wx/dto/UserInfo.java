@@ -4,9 +4,11 @@ public class UserInfo {
     private String userName;
     private String nickName;
     private String avatarUrl;
+    private String mobile;
     private String country;
     private String province;
     private String city;
+
     private String language;
     private Byte gender;
 
@@ -73,4 +75,13 @@ public class UserInfo {
     public void setAvatarUrl(String avatarUrl) {
         this.avatarUrl = avatarUrl;
     }
+
+    public String getMobile() {
+        return mobile;
+    }
+
+    public void setMobile(String mobile) {
+        this.mobile = mobile;
+    }
+
 }

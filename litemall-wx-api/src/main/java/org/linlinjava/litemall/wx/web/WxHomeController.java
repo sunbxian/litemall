@@ -4,16 +4,21 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.linlinjava.litemall.core.system.SystemConfig;
 import org.linlinjava.litemall.core.util.ResponseUtil;
+import org.linlinjava.litemall.core.validator.Order;
+import org.linlinjava.litemall.core.validator.Sort;
 import org.linlinjava.litemall.db.domain.LitemallCategory;
 import org.linlinjava.litemall.db.domain.LitemallGoods;
+import org.linlinjava.litemall.db.domain.LitemallUser;
 import org.linlinjava.litemall.db.service.*;
 import org.linlinjava.litemall.wx.annotation.LoginUser;
+import org.linlinjava.litemall.wx.dto.UserInfo;
 import org.linlinjava.litemall.wx.service.HomeCacheManager;
 import org.linlinjava.litemall.wx.service.WxGrouponRuleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.constraints.NotNull;
@@ -52,6 +57,9 @@ public class WxHomeController {
 
     @Autowired
     private LitemallCouponService couponService;
+
+    @Autowired
+    private LitemallUserService userService;
 
     private final static ArrayBlockingQueue<Runnable> WORK_QUEUE = new ArrayBlockingQueue<>(9);
 
@@ -192,5 +200,27 @@ public class WxHomeController {
         about.put("longitude", SystemConfig.getMallLongitude());
         about.put("latitude", SystemConfig.getMallLatitude());
         return ResponseUtil.ok(about);
+    }
+
+    /**
+     *
+     */
+    @GetMapping("/grabbers")
+    public Object grabbers(
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "10") Integer limit,
+            @Sort @RequestParam(defaultValue = "add_time") String sort,
+            @Order @RequestParam(defaultValue = "desc") String order) {
+        List<LitemallUser> userList = userService.querySelective("", "", "", "grabber", page, limit, sort, order);
+        List<UserInfo> userInfos = new ArrayList<>();
+        for (LitemallUser user : userList) {
+            UserInfo userInfo = new UserInfo();
+            userInfo.setAvatarUrl(user.getAvatar());
+            userInfo.setNickName(user.getNickname());
+            userInfo.setGender(user.getGender());
+            userInfo.setMobile(userInfo.getMobile());
+            userInfos.add(userInfo);
+        }
+        return ResponseUtil.okList(userInfos);
     }
 }
