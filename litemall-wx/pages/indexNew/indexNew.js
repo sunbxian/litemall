@@ -88,7 +88,6 @@ Page({
 
   getGoodsList: function() {
     var that = this;
-    console.log("getGoodsList");
     util.request(api.GoodsList, {
         categoryId: that.data.currentCategory.id,
         page: that.data.page,
@@ -106,7 +105,7 @@ Page({
   },
   loadMoreData: function() {
     if (this.data.page >= this.data.pages) {
-      util.showErrorToast("已经是最后一页了");
+      // util.showErrorToast("已经是最后一页了");
       return;
     }
 
