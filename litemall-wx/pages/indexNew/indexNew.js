@@ -93,6 +93,18 @@ Page({
         });
       });
   },
+  loadMoreData: function() {
+    if (this.data.page >= this.data.pages) {
+      util.showErrorToast("已经是最后一页了");
+      return;
+    }
+
+    this.setData({
+      page: this.data.page + 1 // 更新到下一页
+    });
+
+    this.getGoodsList(); // 获取下一页数据
+  },
   onUnload: function() {
     // 页面关闭
   },

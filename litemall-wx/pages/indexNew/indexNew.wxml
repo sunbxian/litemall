@@ -4,7 +4,7 @@
       {{item.name}}
     </view>
   </view>
-  <view class="cate-item"> 
+  <view class="cate-item" bindscrolltolower="loadMoreData" scroll-y="true"> 
     <view class="b">
       <navigator class="item" url="/pages/goods/goods?id={{iitem.id}}" wx:for="{{goodsList}}" wx:key="id" wx:for-item="iitem" wx:for-index="iindex">
         <image class="img" src="{{iitem.picUrl}}" background-size="cover"></image>
@@ -20,4 +20,4 @@
       </navigator>
     </view>
   </view>
-</view> 
+</view>
