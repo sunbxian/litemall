@@ -228,6 +228,27 @@ public class WxGoodsController {
 	}
 
 	/**
+	 * 商品分类类目
+	 *
+	 * @param pid 分类类目PID
+	 * @return 商品分类类目
+	 */
+	@GetMapping("categoryByPid")
+	public Object categoryByPid(@NotNull Integer pid) {
+
+		LitemallCategory parent = null;
+		List<LitemallCategory> children = null;
+ 		children = categoryService.queryByPid(pid);
+
+
+		Map<String, Object> data = new HashMap<>();
+		data.put("currentCategory", null);
+		data.put("parentCategory", parent);
+		data.put("brotherCategory", children);
+		return ResponseUtil.ok(data);
+	}
+
+	/**
 	 * 根据条件搜素商品
 	 * <p>
 	 * 1. 这里的前五个参数都是可选的，甚至都是空

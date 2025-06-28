@@ -1,0 +1,23 @@
+<view class="container">
+  <view class="cate-nav">
+    <view wx:for="{{navList}}" class="item {{currentCategory.id == item.id ? 'active' : ''}}" wx:key="id" data-id="{{item.id}}" data-index="{{index}}" bindtap="switchCate">
+      {{item.name}}
+    </view>
+  </view>
+  <view class="cate-item"> 
+    <view class="b">
+      <navigator class="item" url="/pages/goods/goods?id={{iitem.id}}" wx:for="{{goodsList}}" wx:key="id" wx:for-item="iitem" wx:for-index="iindex">
+        <image class="img" src="{{iitem.picUrl}}" background-size="cover"></image>
+        <view class="info">
+          <text class="name">{{iitem.name}}</text>
+          <text class="desc">{{iitem.brief}}</text>
+          <text class="original-price">原价: ￥{{iitem.counterPrice}}</text>
+          <text class="price">
+            <text class="currency">特价: ￥</text>
+            <text class="amount">{{iitem.retailPrice}}</text>
+          </text> 
+        </view>
+      </navigator>
+    </view>
+  </view>
+</view> 

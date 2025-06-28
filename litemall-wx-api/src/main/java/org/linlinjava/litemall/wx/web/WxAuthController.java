@@ -498,6 +498,7 @@ public class WxAuthController {
         String avatar = JacksonUtil.parseString(body, "avatar");
         Byte gender = JacksonUtil.parseByte(body, "gender");
         String nickname = JacksonUtil.parseString(body, "nickname");
+        String referrerUsername = JacksonUtil.parseString(body, "referrer_username");
 
         LitemallUser user = userService.findById(userId);
         if (!StringUtils.isEmpty(avatar)) {
@@ -508,6 +509,17 @@ public class WxAuthController {
         }
         if (!StringUtils.isEmpty(nickname)) {
             user.setNickname(nickname);
+        }
+
+        if (!StringUtils.isEmpty(referrerUsername)) {
+            List<LitemallUser> userList =  userService.queryByUsername(referrerUsername);
+            if (userList.size() > 1) {
+                Integer referrerIdId = userList.get(0).getId();
+                user.setReferrerId(referrerIdId);
+            } else {
+                return ResponseUtil.fail(409, "没有找到该 " +referrerUsername+ " 用户");
+            }
+
         }
 
         if (userService.updateById(user) == 0) {
