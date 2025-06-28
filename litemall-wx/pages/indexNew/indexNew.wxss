@@ -71,7 +71,8 @@
   background: #fff;
   margin-bottom: 20rpx;
   padding: 20rpx;
-  border-radius: 10rpx; 
+  border-radius: 10rpx;
+ 
 }
 
 .cate-item .b .item .img {
@@ -79,7 +80,7 @@
   height: 200rpx;
   margin-right: 20rpx;
   flex-shrink: 0; /* 确保图标位置固定 */
-  border-radius: 10rpx;
+  border-radius: 5rpx;
 } 
 
 .cate-item .b .item .info {
