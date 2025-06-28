@@ -3,7 +3,9 @@ var api = require('../../config/api.js');
 
 Page({
   data: {
-    banner: [], // 添加 banner 数据
+    bannerHeight: 200, // banner 的高度，单位 rpx
+    containerHeight: 0, // container 的动态高度
+    banner: [],
     categoryList: [],
     currentCategory: {}, 
     navList: [],
@@ -13,51 +15,50 @@ Page({
     pages: 1, // 总页数
   },
   onLoad: function(options) {
-    // 页面初始化 options为页面跳转所带来的参数
-    var that = this;
-    
+    this.calculateContainerHeight();
+    this.getCatalog();
+    this.getBanner();
+  },
+  calculateContainerHeight: function() {
+    const that = this;
     wx.getSystemInfo({
       success: function(res) {
+        const windowHeight = res.windowHeight; // 获取屏幕高度，单位 px
+        const bannerHeightPx = that.data.bannerHeight / 750 * res.windowWidth; // 将 rpx 转换为 px
+        const containerHeightPx = windowHeight - bannerHeightPx; // 减去 banner 的高度
         that.setData({
-          scrollHeight: res.windowHeight
+          containerHeight: containerHeightPx
         });
       }
-    }); 
-    this.getCatalog();
-    this.getBanner(); // 获取 banner 数据
+    });
   },
   getCatalog: function() {
-    //CatalogList
     let that = this;
-    wx.showLoading({
-      title: '加载中...',
-    });
+    wx.showLoading({ title: '加载中...' });
     util.request(api.CatalogList).then(function(res) {
- 
-    let currentSubCategoryList = res.data.currentSubCategory;
-    // 添加一个全部的种类
-    let all = {
-      id: 0, 
-      pid: res.data.categoryList[0].id,
-      name: "全部",
-      level: "L2"
-    }
-    currentSubCategoryList.unshift(all);
+      let currentSubCategoryList = res.data.currentSubCategory;
+      let all = {
+        id: 0, 
+        pid: res.data.categoryList[0].id,
+        name: "全部",
+        level: "L2"
+      };
+      currentSubCategoryList.unshift(all);
       that.setData({
         categoryList: res.data.categoryList, 
         navList: currentSubCategoryList, 
         currentCategory: all
       });
       wx.hideLoading();
-      that.getGoodsList(); 
-    }); 
-  }, 
+      that.getGoodsList();
+    });
+  },
   getBanner: function() {
     let that = this;
     util.request(api.IndexUrl).then(function(res) {
       if (res.errno === 0) {
         that.setData({
-          banner: res.data.banner // 设置 banner 数据
+          banner: res.data.banner
         });
       }
     });
@@ -87,21 +88,20 @@ Page({
   },
 
   getGoodsList: function() {
-    var that = this;
+    let that = this;
     util.request(api.GoodsList, {
-        categoryId: that.data.currentCategory.id,
-        page: that.data.page,
-        limit: that.data.limit
-      })
-      .then(function(res) {
-        var arr1 = that.data.goodsList; //从data获取当前datalist数组
-        var arr2 = res.data.list; //从此次请求返回的数据中获取新数组
-        arr1 = arr1.concat(arr2); //合并数组
-        that.setData({
-          goodsList: arr1,
-          pages: res.data.pages //得到总页数
-        });
+      categoryId: that.data.currentCategory.id,
+      page: that.data.page,
+      limit: that.data.limit
+    }).then(function(res) {
+      let arr1 = that.data.goodsList;
+      let arr2 = res.data.list;
+      arr1 = arr1.concat(arr2);
+      that.setData({
+        goodsList: arr1,
+        pages: res.data.pages
       });
+    });
   },
   loadMoreData: function() {
     if (this.data.page >= this.data.pages) {
@@ -131,4 +131,4 @@ Page({
 
     this.getGoodsList();
   }
-})
+});

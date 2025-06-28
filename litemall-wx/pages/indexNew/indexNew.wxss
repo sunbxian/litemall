@@ -1,7 +1,8 @@
 .container {
   display: flex;
   flex-direction: row;
-  height: 100vh;
+  height: calc(100vh - 200rpx); /* 默认减去 banner 的高度 */
+  overflow-y: auto;
 }
 
 .cate-nav {
