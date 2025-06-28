@@ -1,3 +1,15 @@
+<swiper class="banner" indicator-dots="true" autoplay="true" interval="3000" duration="1000">
+  <swiper-item wx:for="{{banner}}" wx:key="id">
+    <block wx:if="{{item.link > 0}}">
+      <navigator url="/pages/goods/goods?id={{item.link}}">
+        <image src="{{item.url}}" background-size="cover"></image>
+      </navigator>
+    </block>
+    <block wx:else>
+      <image src="{{item.url}}" background-size="cover"></image>
+    </block>
+  </swiper-item>
+</swiper>
 <view class="container">
   <view class="cate-nav">
     <view wx:for="{{navList}}" class="item {{currentCategory.id == item.id ? 'active' : ''}}" wx:key="id" data-id="{{item.id}}" data-index="{{index}}" bindtap="switchCate">

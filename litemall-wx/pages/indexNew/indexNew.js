@@ -3,13 +3,14 @@ var api = require('../../config/api.js');
 
 Page({
   data: {
+    banner: [], // 添加 banner 数据
     categoryList: [],
     currentCategory: {}, 
     navList: [],
     goodsList: [],  
     page: 1,
     limit: 30,
-    pages:1, //总页数
+    pages: 1, // 总页数
   },
   onLoad: function(options) {
     // 页面初始化 options为页面跳转所带来的参数
@@ -23,7 +24,7 @@ Page({
       }
     }); 
     this.getCatalog();
-
+    this.getBanner(); // 获取 banner 数据
   },
   getCatalog: function() {
     //CatalogList
@@ -51,6 +52,16 @@ Page({
       that.getGoodsList(); 
     }); 
   }, 
+  getBanner: function() {
+    let that = this;
+    util.request(api.IndexUrl).then(function(res) {
+      if (res.errno === 0) {
+        that.setData({
+          banner: res.data.banner // 设置 banner 数据
+        });
+      }
+    });
+  },
   onReady: function() {
     // 页面渲染完成
   },
@@ -71,7 +82,7 @@ Page({
       })
       that.getGoodsList();//重新调用请求获取下一页数据
     }else{
-      util.showErrorToast("已经是最后一页了");
+      // util.showErrorToast("已经是最后一页了");
     }
   },
 
