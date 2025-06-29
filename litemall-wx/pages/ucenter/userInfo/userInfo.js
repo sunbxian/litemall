@@ -89,7 +89,7 @@ Page({
       }
     }).catch(function(res) {
       wx.hideLoading();
-      util.showErrorToast('保存粗我');
+      util.showErrorToast('保存错误');
     }); 
   }
 });

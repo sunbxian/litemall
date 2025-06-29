@@ -28,6 +28,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static org.linlinjava.litemall.wx.util.WxResponseCode.*;
 
@@ -513,9 +514,15 @@ public class WxAuthController {
 
         if (!StringUtils.isEmpty(referrerUsername)) {
             List<LitemallUser> userList =  userService.queryByUsername(referrerUsername);
-            if (userList.size() > 1) {
+            if (!userList.isEmpty()) {
                 Integer referrerIdId = userList.get(0).getId();
-                user.setReferrerId(referrerIdId);
+                if (Objects.equals(referrerIdId, userId)) {
+                    return ResponseUtil.fail(409, "不能设置自己为推荐人");
+                } else if (user.getReferrerId() != null) {
+                    return ResponseUtil.fail(409, "已经设置过推荐人，不能重复设置");
+                } else {
+                    user.setReferrerId(referrerIdId);
+                }
             } else {
                 return ResponseUtil.fail(409, "没有找到该 " +referrerUsername+ " 用户");
             }

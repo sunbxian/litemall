@@ -239,13 +239,75 @@ Page({
   },
   setReferrer() {
     if (this.data.hasLogin) {
-      wx.navigateTo({
-        url: "/pages/ucenter/referrer/referrer"
+      this.setData({
+        showReferrerModal: true
       });
     } else {
       wx.navigateTo({
         url: "/pages/auth/login/login"
       });
     }
+  },
+  inputReferrerId(e) {
+    this.setData({
+      referrerId: e.detail.value
+    });
+  },
+  confirmReferrer() {
+    const referrerId = this.data.referrerId;
+    if (!referrerId) {
+      wx.showToast({
+        title: '推荐人ID不能为空',
+        icon: 'none'
+      });
+      return;
+    }
+  
+    // 提交推荐人ID到服务器
+    const submitData = {
+      referrer_username: referrerId
+    };
+    
+    wx.showLoading({ title: '保存中...' });  
+    util.request(api.AuthProfile, submitData , 'POST').then(function(res) {
+      wx.hideLoading();
+      if (res.errno === 0) {  
+        wx.showToast({
+          title: '推荐人设置成功',
+          icon: 'success'
+        });
+      } else {
+        util.showErrorToast(res.errmsg);
+      }
+    }).catch(function(res) {
+      wx.hideLoading();
+      util.showErrorToast('保存错误');
+    });   
+  },
+  cancelReferrer() {
+    this.setData({
+      showReferrerModal: false,
+      referrerId: ''
+    });
+  },
+  copyUserName() {
+    console.log('复制用户名');
+    const userName = this.data.userInfo.userName;
+    if (!userName) {
+      wx.showToast({
+        title: '用户ID为空',
+        icon: 'none'
+      });
+      return;
+    }
+    wx.setClipboardData({
+      data: userName,
+      success: function () {
+        wx.showToast({
+          title: '复制成功',
+          icon: 'success'
+        });
+      }
+    });
   }
 })

@@ -1,9 +1,12 @@
 <view class="container">
-  <view class="profile-info" bindtap="goLogin">
-    <image class="avatar" src="{{userInfo.avatarUrl}}"></image>
+  <view class="profile-info">
+    <image class="avatar" src="{{userInfo.avatarUrl}}" bindtap="goLogin"></image>
     <view class="info">
-      <text class="name">{{userInfo.nickName}}</text>
-     <text class="name" style="font-size: 14px;">ID: {{userInfo.userName}}</text>
+      <text class="name" bindtap="goLogin">{{userInfo.nickName}}</text>
+      <view class="user-id" wx:if="{{hasLogin}}">
+        <text bindtap="goLogin" class="name" style="font-size: 14px;">ID: {{userInfo.userName}}</text>
+        <button class="copy-btn" bindtap="copyUserName">复制</button>
+      </view>
     </view>
   </view>
 
