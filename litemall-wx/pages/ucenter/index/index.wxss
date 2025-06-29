@@ -192,9 +192,9 @@ page {
 }
 
 .copy-btn {
-  background-color: transparent; /* 背景透明 */
-  color: #28a745; /* 字体颜色为绿色 */
-  border: 0px solid #28a745; /* 添加绿色边框 */
+  background-color: #b4282d;
+  color: #fff;
+  border: none;
   border-radius: 4rpx;
   padding: 2rpx 6rpx;
   font-size: 28rpx; /* 调整为适合的字体大小 */

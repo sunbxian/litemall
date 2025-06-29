@@ -1,11 +1,11 @@
 {
-  "pages": [
-    "pages/ucenter/index/index",
+  "pages": [ 
     "pages/test/test", 
     "pages/index/index",
     "pages/catalog/catalog",
     "pages/newGoods/newGoods",
     "pages/hotGoods/hotGoods", 
+    "pages/ucenter/index/index",
     "pages/ucenter/address/address",
     "pages/ucenter/addressAdd/addressAdd",
     "pages/ucenter/feedback/feedback",

@@ -95,7 +95,7 @@
 </view>
 
 <!-- 悬浮的优惠券显示区域 -->
-<view class="coupon-float" wx:if="{{showCouponFloat}}">
+<view class="coupon-float" wx:if="{{showCouponFloat && coupon.length > 0}}">
   <view class="a-section a-coupon">
     <view class="h">
       <view class="title">

@@ -3,7 +3,7 @@ var api = require('../../config/api.js');
 
 Page({
   data: {
-    bannerHeight: 133,       // banner高度
+    bannerHeight: 132,       // banner高度
     categoryHeight: 0,      // 分类列表高度
     isFixed: false,         // 是否固定分类
     fixedTop: 0,            // 固定定位的top值
@@ -89,7 +89,8 @@ Page({
       if (res.errno === 0) {
         that.setData({
           banner: res.data.banner,
-          coupon: res.data.couponList
+          coupon: res.data.couponList,
+          showCouponFloat: res.data.couponList.length > 0 // 根据优惠券数量设置显示状态
         });
       }
     });
