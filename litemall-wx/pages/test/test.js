@@ -18,6 +18,9 @@ Page({
     page: 1,
     limit: 10,
     pages: 1, // 总页数
+    banner: [], // 添加 banner 数据
+    coupon: [], // 添加 coupon 数据
+    showCouponFloat: true // 控制悬浮优惠券的显示
   },
   
   onLoad() {
@@ -32,6 +35,8 @@ Page({
     });
 
     this.getCatalog(); // 获取分类数据
+    this.getBanner(); // 获取 banner 数据
+    this.getCouponList(); // 获取 coupon 数据
   },
 
   getCatalog: function() {
@@ -51,6 +56,43 @@ Page({
       });
       wx.hideLoading();
       that.getGoodsList();
+    });
+  },
+
+  getBanner: function() {
+    let that = this;
+    util.request(api.IndexUrl).then(function(res) {
+      if (res.errno === 0) {
+        that.setData({
+          banner: res.data.banner
+        });
+      }
+    });
+  },
+
+  getCouponList: function() {
+    let that = this;
+    util.request(api.IndexUrl).then(function(res) {
+      if (res.errno === 0) {
+        that.setData({
+          coupon: res.data.couponList
+        });
+      }
+    });
+  },
+
+  getCoupon(e) {
+    let couponId = e.currentTarget.dataset.index;
+    util.request(api.CouponReceive, {
+      couponId: couponId
+    }, 'POST').then(res => {
+      if (res.errno === 0) {
+        wx.showToast({
+          title: "领取成功"
+        });
+      } else {
+        util.showErrorToast(res.errmsg);
+      }
     });
   },
 
@@ -117,5 +159,11 @@ Page({
     });
     console.log("loadMoreData")
     this.getGoodsList();
+  },
+
+  closeCouponFloat() {
+    this.setData({
+      showCouponFloat: false
+    });
   }
 });

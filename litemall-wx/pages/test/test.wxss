@@ -16,8 +16,14 @@ page {
 
 /* Banner区域样式 */
 .banner {
-  width: 100%;
+  width: 750rpx;
+  height: 417rpx;
   overflow: hidden;
+}
+
+.banner image {
+  width: 100%;
+  height: 417rpx;
 }
 
 .banner-text {
@@ -129,7 +135,6 @@ page {
 } */
   
   
- 
 
 .product-list .item {
   display: flex; 
@@ -203,4 +208,122 @@ page {
   padding: 10px;
   color: #999;
   font-size: 12px;
+}
+
+/* 优惠券样式 */
+.coupon_item {
+  position: relative;
+  background: linear-gradient(136deg, #fdda96 0, #e3ad61 100%);
+  margin: 0 0.5rem;
+  margin-bottom: 0.75rem;
+  display: flex;
+  border-radius: 0.3rem;
+}
+
+.coupon_price {
+  display: flex;
+  width: 6rem;
+  font-size: 0.7rem;
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+  border-radius: 0.2rem;
+  background: linear-gradient(136deg, #ff8787 0, #fb3636 100%);
+}
+
+.coupon_price .price {
+  font-size: 1.8rem;
+}
+
+.coupon_price .p {
+  margin-top: 0.25rem;
+  font-size: 0.6rem;
+}
+
+.coupon_msg {
+  flex: 1;
+  padding: 0.3rem 0 0 0.35rem;
+}
+
+.coupon_condition {
+  font-size: 0.8rem;
+  line-height: 0.95rem;
+  margin-bottom: 0.5rem;
+}
+
+.coupon_tag {
+  display: inline-block;
+  height: 0.7rem;
+  color: #fff;
+  line-height: 0.7rem;
+  text-align: center;
+  padding: 0 0.25rem;
+  border-radius: 0.35rem;
+  background-color: #fe5b5b;
+}
+
+.coupon_instruction {
+  font-size: 0.65rem;
+  margin-bottom: 0.5rem;
+}
+
+.coupon_date {
+  font-size: 0.65rem;
+  color: #999;
+}
+
+/* 悬浮优惠券样式 */
+.coupon-float {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: #fff;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  padding: 10rpx 0;
+}
+
+.coupon-scroll {
+  display: flex;
+  overflow-x: scroll;
+  padding: 0 20rpx;
+}
+
+.coupon-item {
+  flex-shrink: 0;
+  margin-right: 20rpx;
+  padding: 10rpx;
+  background: linear-gradient(136deg, #fdda96 0, #e3ad61 100%);
+  border-radius: 10rpx;
+  text-align: center;
+  color: #fff;
+  font-size: 24rpx;
+}
+
+.coupon-price {
+  font-size: 32rpx;
+  font-weight: bold;
+}
+
+.coupon-desc {
+  font-size: 20rpx;
+  margin-top: 5rpx;
+}
+
+/* 关闭按钮样式 */
+.close-btn {
+  position: absolute;
+  top: 10rpx;
+  right: 20rpx;
+  width: 40rpx;
+  height: 40rpx;
+  line-height: 40rpx;
+  text-align: center;
+  background-color: #ff4d4f;
+  color: #fff;
+  border-radius: 50%;
+  font-size: 30rpx;
+  z-index: 1001;
+  cursor: pointer;
 }

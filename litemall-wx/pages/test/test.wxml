@@ -7,13 +7,19 @@
     scroll-top="{{scrollTop}}"
     style="height: 100vh;"
   >
-    <!-- Banner区域 - 现在作为滚动内容的一部分 -->
-    <view class="banner" style="height: {{bannerHeight}}px;">
-      <image src="https://via.placeholder.com/750x200/3C9/FFFFFF?text=向上滑动" mode="widthFix" style="width:100%;height:100%;"/>
-      <view class="banner-text">
-        欢迎来到我们的商城！
-      </view>
-    </view>
+    <!-- Banner区域 -->
+    <swiper class="banner" indicator-dots="true" autoplay="true" interval="3000" duration="1000">
+      <swiper-item wx:for="{{banner}}" wx:key="id">
+        <block wx:if="{{item.link > 0}}">
+          <navigator url="/pages/goods/goods?id={{item.link}}">
+            <image src="{{item.url}}" background-size="cover"></image>
+          </navigator>
+        </block>
+        <block wx:else>
+          <image src="{{item.url}}" background-size="cover"></image>
+        </block>
+      </swiper-item>
+    </swiper>
     
     <!-- 内容区域 -->
     <view class="content">
@@ -70,4 +76,15 @@
       {{item.name}}
     </view>
   </scroll-view>
+</view>
+
+<!-- 悬浮的优惠券显示区域 -->
+<view class="coupon-float" wx:if="{{showCouponFloat}}">
+  <scroll-view scroll-x class="coupon-scroll">
+    <view class="coupon-item" wx:for="{{coupon}}" wx:key="id" bindtap="getCoupon" data-index="{{item.id}}">
+      <view class="coupon-price">{{item.discount}}元</view>
+      <view class="coupon-desc">满{{item.min}}元使用</view>
+    </view>
+  </scroll-view>
+  <view class="close-btn" bindtap="closeCouponFloat">×</view>
 </view>
