@@ -17,18 +17,17 @@ page {
 /* Banner区域样式 */
 .banner {
   width: 750rpx;
-  height: 417rpx;
+  height: 200rpx;
   overflow: hidden;
 }
 
 .banner image {
   width: 100%;
-  height: 417rpx;
+  height: 200rpx;
 }
 
 .banner-text {
-  text-align: center;
-  margin-top: 10px;
+  text-align: center; 
   color: #333;
   font-size: 14px;
   background-color: #fff; /* 添加背景色以确保文字清晰 */

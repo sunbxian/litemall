@@ -3,7 +3,7 @@ var api = require('../../config/api.js');
 
 Page({
   data: {
-    bannerHeight: 200,       // banner高度
+    bannerHeight: 250,       // banner高度
     categoryHeight: 0,      // 分类列表高度
     isFixed: false,         // 是否固定分类
     fixedTop: 0,            // 固定定位的top值
