@@ -10,13 +10,16 @@
     <!-- Banner区域 - 现在作为滚动内容的一部分 -->
     <view class="banner" style="height: {{bannerHeight}}px;">
       <image src="https://via.placeholder.com/750x200/3C9/FFFFFF?text=向上滑动" mode="widthFix" style="width:100%;height:100%;"/>
+      <view class="banner-text">
+        欢迎来到我们的商城！
+      </view>
     </view>
     
     <!-- 内容区域 -->
     <view class="content">
       <!-- 分类列表 -->
       <scroll-view 
-        class="category-list {{isFixed ? 'fixed' : ''}}" 
+        class="category-list {{isFixed ? '' : ''}}" 
         scroll-y 
         style="{{isFixed ? 'top:' + fixedTop + 'px; height:' + categoryHeight + 'px;' : 'height:' + categoryHeight + 'px;'}}"
       >
@@ -32,16 +35,20 @@
       </scroll-view>
       
       <!-- 商品列表 -->
-      <view class="product-list">
-        <view wx:for="{{currentProducts}}" wx:key="id" class="product-item">
-          <image src="{{item.image}}" mode="aspectFill" class="product-image"/>
-          <view class="product-info">
-            <view class="product-name">{{item.name}}</view>
-            <view class="product-price">¥{{item.price}}</view>
-            <view class="product-sales">销量: {{item.sales}}件</view>
+      <view class="product-list">  
+        <navigator class="item" url="/pages/goods/goods?id={{iitem.id}}" wx:for="{{goodsList}}" wx:key="id" wx:for-item="iitem" wx:for-index="iindex">
+          <image class="img" src="{{iitem.picUrl}}" background-size="cover"></image>
+          <view class="info">
+            <text class="name">{{iitem.name}}</text>
+            <text class="desc">{{iitem.brief}}</text>
+            <text class="original-price">原价: ￥{{iitem.counterPrice}}</text>
+            <text class="price">
+              <text class="currency">现价: ￥</text>
+              <text class="amount">{{iitem.retailPrice}}</text>
+            </text> 
           </view>
-        </view>
-        <view class="loading-more" wx:if="{{isLoading}}">加载中...</view>
+        </navigator>
+        <view class="loading-more" wx:if="{{isLoading && page < pages}}">加载中...</view>
       </view>
     </view>
   </scroll-view>
