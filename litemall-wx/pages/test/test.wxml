@@ -80,11 +80,37 @@
 
 <!-- 悬浮的优惠券显示区域 -->
 <view class="coupon-float" wx:if="{{showCouponFloat}}">
-  <scroll-view scroll-x class="coupon-scroll">
-    <view class="coupon-item" wx:for="{{coupon}}" wx:key="id" bindtap="getCoupon" data-index="{{item.id}}">
-      <view class="coupon-price">{{item.discount}}元</view>
-      <view class="coupon-desc">满{{item.min}}元使用</view>
+  <view class="a-section a-coupon">
+    <view class="h">
+      <view class="title">
+        <view>
+          <navigator url="/pages/coupon/coupon">
+            <text class="txt">优惠券</text>
+          </navigator>
+        </view>
+      </view>
     </view>
-  </scroll-view>
+    <view wx:if="{{coupon.length > 0}}" class="b">
+      <view class="coupon_item" wx:for="{{coupon}}" wx:key="id" bindtap="getCoupon" data-index="{{item.id}}">
+        <view class="coupon_price">
+          <view>
+            <view class="price">{{item.discount}}元</view>
+            <view class="p">满{{item.min}}元使用</view>
+          </view>
+        </view>
+        <view class="coupon_msg">
+          <view class="coupon_condition">
+            <view class="coupon_tag">
+              <view class="coupon_tag_text">{{item.tag}}</view>
+            </view>
+            <view class="text">{{item.name}}</view>
+          </view>
+          <view class="coupon_instruction">{{item.desc}}</view>
+          <view class="coupon_date" wx:if="{{item.days != 0}}">{{item.days}}天</view>
+          <view class="coupon_date" wx:else>{{item.startTime}} - {{item.endTime}}</view>
+        </view>
+      </view>
+    </view>
+  </view>
   <view class="close-btn" bindtap="closeCouponFloat">×</view>
 </view>
