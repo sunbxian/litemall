@@ -15,7 +15,9 @@ Page({
       unrecv: 0,
       uncomment: 0
     },
-    hasLogin: false
+    hasLogin: false,
+    showReferrerModal: false,
+    referrerId: ''
   },
   onLoad: function(options) {
     // 页面初始化 options为页面跳转所带来的参数
@@ -234,5 +236,16 @@ Page({
       }
     })
 
+  },
+  setReferrer() {
+    if (this.data.hasLogin) {
+      wx.navigateTo({
+        url: "/pages/ucenter/referrer/referrer"
+      });
+    } else {
+      wx.navigateTo({
+        url: "/pages/auth/login/login"
+      });
+    }
   }
 })
