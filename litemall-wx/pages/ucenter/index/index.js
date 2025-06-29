@@ -267,17 +267,25 @@ Page({
     const submitData = {
       referrer_username: referrerId
     };
-    
+
+    let that = this;
     wx.showLoading({ title: '保存中...' });  
     util.request(api.AuthProfile, submitData , 'POST').then(function(res) {
       wx.hideLoading();
       if (res.errno === 0) {  
         wx.showToast({
           title: '推荐人设置成功',
-          icon: 'success'
+          icon: 'none'
+        });
+        that.setData({
+          showReferrerModal: false,
+          referrerId: ''
         });
       } else {
-        util.showErrorToast(res.errmsg);
+        wx.showToast({
+          title: res.errmsg,
+          icon: 'none'
+        }); 
       }
     }).catch(function(res) {
       wx.hideLoading();

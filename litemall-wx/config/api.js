@@ -10,6 +10,7 @@ var WxApiRoot = 'http://localhost:8080/wx/';
 
 module.exports = {
   IndexUrl: WxApiRoot + 'home/index', //首页数据接口
+  GrabbersUrl: WxApiRoot + 'home/grabbers', //首页数据接口
   AboutUrl: WxApiRoot + 'home/about', //介绍信息
 
   CatalogList: WxApiRoot + 'catalog/index', //分类目录全部分类数据接口
