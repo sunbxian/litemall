@@ -218,7 +218,7 @@ public class WxHomeController {
             userInfo.setAvatarUrl(user.getAvatar());
             userInfo.setNickName(user.getNickname());
             userInfo.setGender(user.getGender());
-            userInfo.setMobile(userInfo.getMobile());
+            userInfo.setMobile(user.getMobile());
             userInfos.add(userInfo);
         }
         return ResponseUtil.okList(userInfos);

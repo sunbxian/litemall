@@ -3,7 +3,7 @@ var api = require('../../config/api.js');
 
 Page({
   data: {
-    bannerHeight: 250,       // banner高度
+    bannerHeight: 133,       // banner高度
     categoryHeight: 0,      // 分类列表高度
     isFixed: false,         // 是否固定分类
     fixedTop: 0,            // 固定定位的top值
@@ -20,7 +20,9 @@ Page({
     pages: 1, // 总页数
     banner: [], // 添加 banner 数据
     coupon: [], // 添加 coupon 数据
-    showCouponFloat: true // 控制悬浮优惠券的显示
+    showCouponFloat: true, // 控制悬浮优惠券的显示
+
+    grabbers: [],  // 配送员
   },
   
   onLoad() {
@@ -33,10 +35,32 @@ Page({
         });
       }
     });
-
+    this.getGrabbers(); // 这是
     this.getCatalog(); // 获取分类数据
-    this.getBanner(); // 获取 banner 数据
-    this.getCouponList(); // 获取 coupon 数据
+    this.getIndexData(); // 获取 IndexData 数据
+ 
+  },
+
+  getGrabbers: function() {
+    let that = this;
+    util.request(api.GrabbersUrl).then(function(res) {
+      if (res.errno === 0) {
+        const grabbers = res.data.list
+        // // 确保 grabbers 数据结构正确
+        // const grabbers = res.data.list.map(item => ({
+        //   id: item.id,
+        //   nickName: item.name || "未知配送员" // 如果 name 为空，设置默认值
+        // }));
+        grabbers.unshift({
+          id: 1,
+          nickName: "请选择配送员", // 添加一个默认选项
+          mobile: "15889707030"
+        }); // 添加一个空对象作为默认选项
+        that.setData({
+          grabbers: grabbers
+        });
+      }
+    });
   },
 
   getCatalog: function() {
@@ -59,28 +83,18 @@ Page({
     });
   },
 
-  getBanner: function() {
+  getIndexData: function() {
     let that = this;
     util.request(api.IndexUrl).then(function(res) {
       if (res.errno === 0) {
         that.setData({
-          banner: res.data.banner
-        });
-      }
-    });
-  },
-
-  getCouponList: function() {
-    let that = this;
-    util.request(api.IndexUrl).then(function(res) {
-      if (res.errno === 0) {
-        that.setData({
+          banner: res.data.banner,
           coupon: res.data.couponList
         });
       }
     });
   },
-
+ 
   getCoupon(e) {
     let couponId = e.currentTarget.dataset.index;
     util.request(api.CouponReceive, {
@@ -164,6 +178,24 @@ Page({
   closeCouponFloat() {
     this.setData({
       showCouponFloat: false
+    });
+  },
+
+  showGrabberInfo: function(e) {
+    const grabber = e.currentTarget.dataset.grabber;
+    wx.showModal({
+      title: '配送员信息',
+      content: `姓名：${grabber.nickName}\n手机：${grabber.mobile}`,
+      showCancel: true,
+      cancelText: '取消',
+      confirmText: '拨打电话',
+      success: function(res) {
+        if (res.confirm) {
+          wx.makePhoneCall({
+            phoneNumber: grabber.mobile
+          });
+        }
+      }
     });
   }
 });

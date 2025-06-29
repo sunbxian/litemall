@@ -21,8 +21,19 @@
           </block>
         </swiper-item>
       </swiper>
-      <view class="banner-text">
-        <text>欢迎来到我们的商城！</text>
+      <view class="banner-text"> 
+        <!-- 上下滚动的 grabbers -->
+        <swiper 
+          class="grabbers-swiper" 
+          vertical="true" 
+          autoplay="true" 
+          interval="2000" 
+          circular="true"
+        >
+          <swiper-item wx:for="{{grabbers}}" wx:key="id" bindtap="showGrabberInfo" data-grabber="{{item}}">
+            <text>配送员：{{item.nickName}}   手机：{{item.mobile}} </text>
+          </swiper-item>
+        </swiper>
       </view>
     </view>
     

@@ -28,10 +28,23 @@ page {
 
 .banner-text {
   text-align: center; 
-  color: #333;
+  color: #DDAA44;
   font-size: 14px;
-  background-color: #fff; /* 添加背景色以确保文字清晰 */
-  padding: 5px 0;
+  background-color: #FFF8E1; /* 添加背景色以确保文字清晰 */
+ 
+}
+
+.grabbers-swiper {
+  height: 60rpx; /* 增加滚动区域高度 */
+  line-height: 60rpx;
+  overflow: hidden;
+  color: #DDAA44; /* 设置字体颜色为白色 */
+  font-size: 14px; /* 字体稍微大一点 */
+  background-color: #FFF8E1; /* 设置背景为警告色 */
+}
+
+.grabbers-swiper text {
+  color: #DDAA44; /* 设置文本颜色为 #DDAA44 */
 }
 
 /* 内容区域样式 */
