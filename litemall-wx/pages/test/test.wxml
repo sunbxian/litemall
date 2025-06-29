@@ -1,0 +1,66 @@
+<view class="container">
+  <!-- 整个可滚动区域 -->
+  <scroll-view 
+    scroll-y 
+    class="main-scroll" 
+    bindscroll="onScroll"
+    scroll-top="{{scrollTop}}"
+    style="height: 100vh;"
+  >
+    <!-- Banner区域 - 现在作为滚动内容的一部分 -->
+    <view class="banner" style="height: {{bannerHeight}}px;">
+      <image src="https://via.placeholder.com/750x200/3C9/FFFFFF?text=向上滑动" mode="widthFix" style="width:100%;height:100%;"/>
+    </view>
+    
+    <!-- 内容区域 -->
+    <view class="content">
+      <!-- 分类列表 -->
+      <scroll-view 
+        class="category-list {{isFixed ? 'fixed' : ''}}" 
+        scroll-y 
+        style="{{isFixed ? 'top:' + fixedTop + 'px; height:' + categoryHeight + 'px;' : 'height:' + categoryHeight + 'px;'}}"
+      >
+        <view 
+          wx:for="{{categories}}" 
+          wx:key="id" 
+          class="category-item {{activeCategory === index ? 'active' : ''}}"
+          bindtap="switchCategory"
+          data-index="{{index}}"
+        >
+          {{item.name}}
+        </view>
+      </scroll-view>
+      
+      <!-- 商品列表 -->
+      <view class="product-list">
+        <view wx:for="{{currentProducts}}" wx:key="id" class="product-item">
+          <image src="{{item.image}}" mode="aspectFill" class="product-image"/>
+          <view class="product-info">
+            <view class="product-name">{{item.name}}</view>
+            <view class="product-price">¥{{item.price}}</view>
+            <view class="product-sales">销量: {{item.sales}}件</view>
+          </view>
+        </view>
+        <view class="loading-more" wx:if="{{isLoading}}">加载中...</view>
+      </view>
+    </view>
+  </scroll-view>
+  
+  <!-- 固定位置的分类列表（克隆元素，用于固定效果） -->
+  <scroll-view 
+    class="category-list fixed-clone" 
+    wx:if="{{isFixed}}"
+    style="top: {{fixedTop}}px; height: {{categoryHeight}}px;"
+    scroll-y
+  >
+    <view 
+      wx:for="{{categories}}" 
+      wx:key="id" 
+      class="category-item {{activeCategory === index ? 'active' : ''}}"
+      bindtap="switchCategory"
+      data-index="{{index}}"
+    >
+      {{item.name}}
+    </view>
+  </scroll-view>
+</view>
