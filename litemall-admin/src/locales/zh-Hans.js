@@ -308,7 +308,7 @@ export default {
       pay_time: '支付时间',
       consignee: '收货人',
       mobile: '收货电话',
-      grabName: '送水员',
+      grabName: '配送员',
       ship_sn: '物流单号',
       ship_channel: '物流渠道',
       actions: '操作',
@@ -326,7 +326,7 @@ export default {
       detail: '订单详情',
       pay: '订单收款',
       ship: '发货',
-      water: '送水',
+      water: '配送',
       refund: '退款'
     },
     form: {
@@ -343,8 +343,8 @@ export default {
       detail_receipt_info: '收货信息',
       pay_old_money: '订单金额',
       pay_new_money: '付款金额',
-      water_name: '送水员名称',
-      water_phone: '送水员电话',
+      water_name: '配送员名称',
+      water_phone: '配送员电话',
       ship_channel: '快递公司',
       ship_sn: '快递编号',
       refund_money: '退款金额'
@@ -357,7 +357,7 @@ export default {
       filter_time_end: '结束日期',
       filter_order_status: '请选择订单状态',
       ship_channel: '请选择',
-      search_user: '搜索送水员'
+      search_user: '搜索配送员'
     },
     message: {
       pay_confirm: '确认当前订单（订单编号 {order_sn} ) 已经完成线下收款  ？'
@@ -365,7 +365,7 @@ export default {
     button: {
       pay: '收款',
       ship: '发货',
-      water: '送水',
+      water: '配送',
       refund: '退款',
       detail_cancel: '取 消',
       detail_print: '打 印'
