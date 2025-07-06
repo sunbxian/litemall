@@ -1,0 +1,25 @@
+<view class="container"> 
+  <view class="no-order" wx:if="{{orderList.length <= 0}}">
+    <view class="c">
+      <text>还没有任何水票呢</text>
+    </view>
+  </view>
+
+  <view class="orders">
+    <navigator url="../orderDetail/orderDetail?id={{item.id}}" class="order" open-type="redirect" wx:for="{{orderList}}" wx:key="id"> 
+      <view class="goods" wx:for="{{item.goodsList}}" wx:key="id" wx:for-item="gitem">
+        <view class="img">
+          <image src="{{gitem.picUrl}}"></image>
+        </view>
+        <view class="info">
+          <text class="name">指定的商品： {{gitem.goodsName}}</text>
+          <text class="number">共：{{gitem.ticketCount}}桶， 还剩：{{item.ticketCount}}</text>
+        </view>
+        <view class="status"></view>
+      </view>
+      <view class="b">
+        <view class="l">实付：￥{{item.actualPrice}}</view>
+      </view>
+    </navigator>
+  </view>
+</view>

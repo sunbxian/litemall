@@ -380,7 +380,7 @@ public class WxOrderService {
         }
 
         LitemallOrder payTicket = null;
-        if (payTicketId != null) {
+        if (payTicketId != null && payTicketId != 0 && payTicketId != -1) {
             payTicket = orderService.findById(payTicketId);
         }
 
@@ -1201,7 +1201,7 @@ public class WxOrderService {
         order = new LitemallOrder();
         order.setUserId(userId);
         order.setOrderSn(orderService.generateOrderSn(userId));
-        order.setOrderStatus(OrderUtil.STATUS_PAY);
+        order.setOrderStatus(OrderUtil.STATUS_CONFIRM);
         order.setConsignee("水票赠送");
         order.setMobile("");
         order.setMessage("");

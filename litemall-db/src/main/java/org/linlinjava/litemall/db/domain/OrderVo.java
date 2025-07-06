@@ -23,6 +23,16 @@ public class OrderVo {
     private String shipSn;
     private String message;
     private String grabName;
+
+    public Integer getTicketCount() {
+        return ticketCount;
+    }
+
+    public void setTicketCount(Integer ticketCount) {
+        this.ticketCount = ticketCount;
+    }
+
+    private Integer ticketCount;
     private LocalDateTime payTime;
     private List<OrderGoodsVo> goodsVoList;
 
@@ -209,6 +219,7 @@ public class OrderVo {
                 ", grabName='" + grabName + '\'' +
                 ", payTime=" + payTime +
                 ", goodsVoList=" + goodsVoList +
+                ", ticketCount=" + ticketCount +
                 '}';
     }
 }

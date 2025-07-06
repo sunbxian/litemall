@@ -141,6 +141,7 @@
         <result column="user_name" property="userName"/>
         <result column="user_avatar" property="userAvatar"/>
         <result column="grab_name" property="grabName"/>
+        <result column="ticket_count" property="ticketCount"/>
 
         <collection property="goodsVoList" ofType="org.linlinjava.litemall.db.domain.OrderGoodsVo">
             <id column="ogid" property="id"/>
@@ -155,7 +156,7 @@
     </resultMap>
     <select id="getOrderList" resultMap="orderList">
         select o.id, o.order_sn, o.order_status, o.actual_price, o.freight_price, o.add_time, o.message,
-        o.consignee, o.address, o.mobile, o.pay_time, o.order_price, o.ship_channel, o.ship_sn,
+        o.consignee, o.address, o.mobile, o.pay_time, o.order_price, o.ship_channel, o.ship_sn, o.ticket_count,
         u.id user_id, u.nickname user_name, u.avatar user_avatar, o.integral_price, u2.nickname grab_name,
         og.id ogid, og.goods_id, og.product_id, og.goods_name, og.pic_url goods_picture,
         og.specifications goods_specifications, og.number goods_number, og.price goods_price

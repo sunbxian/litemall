@@ -14,13 +14,16 @@ Page({
     grouponPrice: 0.00, //团购优惠价格
     orderTotalPrice: 0.00, //订单总价
     actualPrice: 0.00, //实际需要支付的总价
+    orderTicketCount: 0,  //可用的水票
+    ticketCount: 0,   //选择的水票可以购买的桶数
     cartId: 0,
     addressId: 0,
     couponId: 0,
     userCouponId: 0,
     message: '',
     grouponLinkId: 0, //参与的团购
-    grouponRulesId: 0 //团购规则ID
+    grouponRulesId: 0, //团购规则ID
+    orderId: 0
   },
   onLoad: function(options) {
     // 页面初始化 options为页面跳转所带来的参数
@@ -33,6 +36,7 @@ Page({
       cartId: that.data.cartId,
       addressId: that.data.addressId,
       couponId: that.data.couponId,
+      orderId: that.data.orderId,
       userCouponId: that.data.userCouponId,
       grouponRulesId: that.data.grouponRulesId
     }).then(function(res) {
@@ -49,8 +53,11 @@ Page({
           orderTotalPrice: res.data.orderTotalPrice,
           addressId: res.data.addressId,
           couponId: res.data.couponId,
+          orderId: res.data.orderId,
           userCouponId: res.data.userCouponId,
           grouponRulesId: res.data.grouponRulesId,
+          orderTicketCount: res.data.orderTicketCount,
+          ticketCount: res.data.ticketCount
         });
       }
       wx.hideLoading();
@@ -59,6 +66,11 @@ Page({
   selectAddress() {
     wx.navigateTo({
       url: '/pages/ucenter/address/address',
+    })
+  },
+  selectOrder() {
+    wx.navigateTo({
+      url: '/pages/ucenter/ticketSelect/ticketSelect',
     })
   },
   selectCoupon() {
@@ -93,6 +105,10 @@ Page({
       if (couponId === "") {
         couponId = 0;
       }
+      var orderId = wx.getStorageSync('orderId');
+      if (orderId === "") {
+        orderId = 0;
+      }
       var userCouponId = wx.getStorageSync('userCouponId');
       if (userCouponId === "") {
         userCouponId = 0;
@@ -110,6 +126,7 @@ Page({
         cartId: cartId,
         addressId: addressId,
         couponId: couponId,
+        orderId: orderId,
         userCouponId: userCouponId,
         grouponRulesId: grouponRulesId,
         grouponLinkId: grouponLinkId
@@ -138,11 +155,12 @@ Page({
     util.request(api.OrderSubmit, {
       cartId: this.data.cartId,
       addressId: this.data.addressId,
-      couponId: this.data.couponId,
+      couponId: this.data.couponId, 
       userCouponId: this.data.userCouponId,
       message: this.data.message,
       grouponRulesId: this.data.grouponRulesId,
-      grouponLinkId: this.data.grouponLinkId
+      grouponLinkId: this.data.grouponLinkId,
+      payTicketId: this.data.orderId,
     }, 'POST').then(res => {
       if (res.errno === 0) {
 

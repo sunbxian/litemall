@@ -1,37 +1,86 @@
-const util = require('../../utils/util.js');
-const api = require('../../config/api.js');
-const user = require('../../utils/user.js');
-
-//获取应用实例
-const app = getApp();
+var util = require('../../utils/util.js');
+var api = require('../../config/api.js');
 
 Page({
   data: {
-    newGoods: [],
-    hotGoods: [],
-    topics: [],
-    brands: [],
-    groupons: [],
-    floorGoods: [],
-    banner: [],
-    channel: [],
-    coupon: [],
-    goodsCount: 0
+    bannerHeight: 132,       // banner高度
+    categoryHeight: 0,      // 分类列表高度
+    isFixed: false,         // 是否固定分类
+    fixedTop: 0,            // 固定定位的top值
+    scrollTop: 0,           // 滚动位置
+    activeCategory: 0,      // 当前选中分类
+    isLoading: false,       // 是否正在加载 
+    // 分类数据
+    categories: [],
+
+    goodsList: [],
+
+    page: 1,
+    limit: 10,
+    pages: 1, // 总页数
+    banner: [], // 添加 banner 数据
+    coupon: [], // 添加 coupon 数据
+    showCouponFloat: true, // 控制悬浮优惠券的显示
+
+    grabbers: [],  // 配送员
   },
 
-  onShareAppMessage: function() {
-    return {
-      title: 'litemall小程序商场',
-      desc: '开源微信小程序商城',
-      path: '/pages/index/index'
-    }
+  onLoad() {
+    // 获取系统信息
+    wx.getSystemInfo({
+      success: (res) => {
+        this.setData({
+          fixedTop: 0, // 导航栏高度
+          categoryHeight: res.windowHeight
+        });
+      }
+    });
+    this.getGrabbers(); // 这是
+    this.getCatalog(); // 获取分类数据
+    this.getIndexData(); // 获取 IndexData 数据
+
   },
 
-  onPullDownRefresh() {
-    wx.showNavigationBarLoading() //在标题栏中显示加载
-    this.getIndexData();
-    wx.hideNavigationBarLoading() //完成停止加载
-    wx.stopPullDownRefresh() //停止下拉刷新
+  getGrabbers: function() {
+    let that = this;
+    util.request(api.GrabbersUrl).then(function(res) {
+      if (res.errno === 0) {
+        const grabbers = res.data.list
+        // // 确保 grabbers 数据结构正确
+        // const grabbers = res.data.list.map(item => ({
+        //   id: item.id,
+        //   nickName: item.name || "未知配送员" // 如果 name 为空，设置默认值
+        // }));
+        grabbers.unshift({
+          id: 1,
+          nickName: "请选择配送员", // 添加一个默认选项
+          mobile: "15889707030"
+        }); // 添加一个空对象作为默认选项
+        that.setData({
+          grabbers: grabbers
+        });
+      }
+    });
+  },
+
+  getCatalog: function() {
+    let that = this;
+    wx.showLoading({ title: '加载中...' });
+    util.request(api.CatalogList).then(function(res) {
+      let currentSubCategoryList = res.data.currentSubCategory;
+      let all = {
+        id: 0,
+        pid: res.data.categoryList[0].id,
+        name: "全部",
+        level: "L2"
+      };
+      currentSubCategoryList.unshift(all);
+      that.setData({
+        categories: currentSubCategoryList
+      });
+      wx.hideLoading();
+      that.getGoodsList();
+    });
   },
 
   getIndexData: function() {
@@ -39,103 +88,115 @@ Page({
     util.request(api.IndexUrl).then(function(res) {
       if (res.errno === 0) {
         that.setData({
-          newGoods: res.data.newGoodsList,
-          hotGoods: res.data.hotGoodsList,
-          topics: res.data.topicList,
-          brands: res.data.brandList,
-          floorGoods: res.data.floorGoodsList,
           banner: res.data.banner,
-          groupons: res.data.grouponList,
-          channel: res.data.channel,
-          coupon: res.data.couponList
+          coupon: res.data.couponList,
+          showCouponFloat: res.data.couponList.length > 0 // 根据优惠券数量设置显示状态
         });
       }
     });
-    util.request(api.GoodsCount).then(function (res) {
-      that.setData({
-        goodsCount: res.data
-      });
-    });
   },
-  onLoad: function(options) {
 
-    // 页面初始化 options为页面跳转所带来的参数
-    if (options.scene) {
-      //这个scene的值存在则证明首页的开启来源于朋友圈分享的图,同时可以通过获取到的goodId的值跳转导航到对应的详情页
-      var scene = decodeURIComponent(options.scene);
-      console.log("scene:" + scene);
-
-      let info_arr = [];
-      info_arr = scene.split(',');
-      let _type = info_arr[0];
-      let id = info_arr[1];
-
-      if (_type == 'goods') {
-        wx.navigateTo({
-          url: '../goods/goods?id=' + id
-        });
-      } else if (_type == 'groupon') {
-        wx.navigateTo({
-          url: '../goods/goods?grouponId=' + id
-        });
-      } else {
-        wx.navigateTo({
-          url: '../index/index'
-        });
-      }
-    }
-
-    // 页面初始化 options为页面跳转所带来的参数
-    if (options.grouponId) {
-      //这个pageId的值存在则证明首页的开启来源于用户点击来首页,同时可以通过获取到的pageId的值跳转导航到对应的详情页
-      wx.navigateTo({
-        url: '../goods/goods?grouponId=' + options.grouponId
-      });
-    }
-
-    // 页面初始化 options为页面跳转所带来的参数
-    if (options.goodId) {
-      //这个goodId的值存在则证明首页的开启来源于分享,同时可以通过获取到的goodId的值跳转导航到对应的详情页
-      wx.navigateTo({
-        url: '../goods/goods?id=' + options.goodId
-      });
-    }
-
-    // 页面初始化 options为页面跳转所带来的参数
-    if (options.orderId) {
-      //这个orderId的值存在则证明首页的开启来源于订单模版通知,同时可以通过获取到的pageId的值跳转导航到对应的详情页
-      wx.navigateTo({
-        url: '../ucenter/orderDetail/orderDetail?id=' + options.orderId
-      });
-    }
-
-    this.getIndexData();
-  },
-  onReady: function() {
-    // 页面渲染完成
-  },
-  onShow: function() {
-    // 页面显示
-  },
-  onHide: function() {
-    // 页面隐藏
-  },
-  onUnload: function() {
-    // 页面关闭
-  },
   getCoupon(e) {
-    let couponId = e.currentTarget.dataset.index
+    let couponId = e.currentTarget.dataset.index;
     util.request(api.CouponReceive, {
       couponId: couponId
     }, 'POST').then(res => {
       if (res.errno === 0) {
         wx.showToast({
           title: "领取成功"
-        })
-      }
-      else{
+        });
+      } else {
         util.showErrorToast(res.errmsg);
       }
-    })
+    });
   },
-})
+
+  getGoodsList: function() {
+    let categoryId = this.data.categories[this.data.activeCategory].id
+    console.log(categoryId)
+    let that = this;
+    util.request(api.GoodsList, {
+      categoryId: categoryId,
+      page: that.data.page,
+      limit: that.data.limit
+    }).then(function(res) {
+      let arr1 = that.data.goodsList;
+      let arr2 = res.data.list;
+      arr1 = arr1.concat(arr2);
+      that.setData({
+        goodsList: arr1,
+        pages: res.data.pages
+      });
+    });
+  },
+
+  onScroll(e) {
+    const scrollTop = e.detail.scrollTop;
+    const bannerHeight = this.data.bannerHeight;
+
+    // 判断是否应该固定分类列表
+    const shouldFix = scrollTop >= bannerHeight;
+    this.setData({
+      // scrollTop: scrollTop,
+      isFixed: shouldFix
+    });
+
+    // 模拟加载更多
+    if (scrollTop > 320 && !this.data.isLoading) {
+      console.log('scrollTop ', scrollTop)
+      this.loadMoreData();
+    }
+  },
+
+  // 切换分类
+  switchCategory(e) {
+    const index = e.currentTarget.dataset.index;
+    this.setData({
+      isLoading: false, // 切换分类时显示加载中
+      activeCategory: index,
+      page:1, //从第一页开始查
+      goodsList:[]
+    });
+    this.getGoodsList();
+  },
+
+  // 加载更多数据
+  loadMoreData() {
+    if (this.data.page >= this.data.pages) {
+      // 已经是最后一页，不显示加载中
+      this.setData({ isLoading: false });
+      return;
+    }
+
+    this.setData({
+      isLoading: true,
+      page: this.data.page + 1 // 更新到下一页
+    });
+    console.log("loadMoreData")
+    this.getGoodsList();
+  },
+
+  closeCouponFloat() {
+    this.setData({
+      showCouponFloat: false
+    });
+  },
+
+  showGrabberInfo: function(e) {
+    const grabber = e.currentTarget.dataset.grabber;
+    wx.showModal({
+      title: '配送员信息',
+      content: `姓名：${grabber.nickName}\n手机：${grabber.mobile}`,
+      showCancel: true,
+      cancelText: '取消',
+      confirmText: '拨打电话',
+      success: function(res) {
+        if (res.confirm) {
+          wx.makePhoneCall({
+            phoneNumber: grabber.mobile
+          });
+        }
+      }
+    });
+  }
+});

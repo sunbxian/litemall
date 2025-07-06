@@ -7,6 +7,8 @@ import org.apache.commons.logging.LogFactory;
 import org.linlinjava.litemall.core.system.SystemConfig;
 import org.linlinjava.litemall.core.util.JacksonUtil;
 import org.linlinjava.litemall.core.util.ResponseUtil;
+import org.linlinjava.litemall.core.validator.Order;
+import org.linlinjava.litemall.core.validator.Sort;
 import org.linlinjava.litemall.db.domain.*;
 import org.linlinjava.litemall.db.service.*;
 import org.linlinjava.litemall.wx.annotation.LoginUser;
@@ -45,6 +47,8 @@ public class WxCartController {
     private LitemallCouponUserService couponUserService;
     @Autowired
     private CouponVerifyService couponVerifyService;
+    @Autowired
+    private LitemallOrderService orderService;
 
     /**
      * 用户购物车信息
@@ -414,7 +418,7 @@ public class WxCartController {
      * @return 购物车操作结果
      */
     @GetMapping("checkout")
-    public Object checkout(@LoginUser Integer userId, Integer cartId, Integer addressId, Integer couponId, Integer userCouponId, Integer grouponRulesId) {
+    public Object checkout(@LoginUser Integer userId, Integer cartId, Integer addressId, Integer couponId, Integer orderId, Integer userCouponId, Integer grouponRulesId) {
         if (userId == null) {
             return ResponseUtil.unlogin();
         }
@@ -457,12 +461,39 @@ public class WxCartController {
             checkedGoodsList.add(cart);
         }
         BigDecimal checkedGoodsPrice = new BigDecimal(0.00);
+        Map<String, Object> orderData = new HashMap<>();
+        OrderVo orderVoSelect = null;
+
+        int goodsCount = 0;
+        int ticketCount = 0;
         for (LitemallCart cart : checkedGoodsList) {
+            orderData = (Map)orderService.queryVoSelective2(userId, cart.getGoodsId(), null, 1, 10, "add_time", "desc");
+            List<OrderVo> list = (List<OrderVo>) orderData.get("list");
+
+            if (orderId == null || orderId.equals(-1) || orderId.equals(0)){
+                goodsCount = cart.getNumber();
+            } else {
+                for (OrderVo orderVo : list) {
+                    if (Objects.equals(orderVo.getId(), orderId)) {
+                        orderVoSelect = orderVo;
+                        ticketCount = orderVo.getTicketCount();
+                        break;
+                    }
+                }
+                if (orderVoSelect == null) {
+                    goodsCount = cart.getNumber();
+                } else {
+                    if (cart.getNumber() > orderVoSelect.getTicketCount()) {
+                        goodsCount = cart.getNumber() - orderVoSelect.getTicketCount();
+                    }
+                }
+            }
+
             //  只有当团购规格商品ID符合才进行团购优惠
             if (grouponRules != null && grouponRules.getGoodsId().equals(cart.getGoodsId())) {
-                checkedGoodsPrice = checkedGoodsPrice.add(cart.getPrice().subtract(grouponPrice).multiply(new BigDecimal(cart.getNumber())));
+                checkedGoodsPrice = checkedGoodsPrice.add(cart.getPrice().subtract(grouponPrice).multiply(new BigDecimal(goodsCount)));
             } else {
-                checkedGoodsPrice = checkedGoodsPrice.add(cart.getPrice().multiply(new BigDecimal(cart.getNumber())));
+                checkedGoodsPrice = checkedGoodsPrice.add(cart.getPrice().multiply(new BigDecimal(goodsCount)));
             }
         }
 
@@ -528,9 +559,12 @@ public class WxCartController {
 
         BigDecimal actualPrice = orderTotalPrice.subtract(integralPrice);
 
+        int size = ((List<?>) orderData.get("list")).size();
+
         Map<String, Object> data = new HashMap<>();
         data.put("addressId", addressId);
         data.put("couponId", couponId);
+        data.put("orderId", orderId);
         data.put("userCouponId", userCouponId);
         data.put("cartId", cartId);
         data.put("grouponRulesId", grouponRulesId);
@@ -543,6 +577,8 @@ public class WxCartController {
         data.put("orderTotalPrice", orderTotalPrice);
         data.put("actualPrice", actualPrice);
         data.put("checkedGoodsList", checkedGoodsList);
+        data.put("orderTicketCount", size);
+        data.put("ticketCount", ticketCount);
         return ResponseUtil.ok(data);
     }
 }

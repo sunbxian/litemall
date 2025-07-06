@@ -24,6 +24,22 @@
   </view>
 
   <view class="coupon-box">
+    <view class="coupon-item" bindtap="selectOrder">
+      <view class="l" wx:if="{{orderId == 0 || orderId == -1}}">
+        <text class="name">电子水票</text>
+        <text class="txt">{{orderTicketCount}}张</text>
+      </view> 
+      <view class="l" wx:else>
+        <text class="name">已选电子水票</text>
+        <text class="txt">可购买{{ticketCount}}桶</text>
+      </view>      
+      <view class="r">
+        <van-icon name="arrow" />      
+      </view>
+    </view>
+  </view>
+
+  <!-- <view class="coupon-box">
     <view class="coupon-item" bindtap="selectCoupon">
       <view class="l" wx:if="{{couponId == 0}}">
         <text class="name">没有可用的优惠券</text>
@@ -41,7 +57,7 @@
         <van-icon name="arrow" />      
       </view>
     </view>
-  </view>
+  </view> -->
 
   <view class="message-box">
     <input class="message-item" bindinput="bindMessageInput" placeholder="如需要，请输入留言" value="{{message}}" />

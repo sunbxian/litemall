@@ -280,4 +280,49 @@ public class LitemallOrderService {
         data.put("pages", list1.getPages());
         return data;
     }
+
+    public Map<String, Object> queryVoSelective2(Integer user_id, Integer designated_id, List<Short> orderStatusArray, Integer page, Integer limit, String sort, String order) {
+        List<String> querys = new ArrayList<>();
+
+        if (user_id == null || user_id >= 0) {
+            querys.add(" o.user_id = " + user_id + " ");
+        }
+        if (designated_id == null || designated_id >= 0) {
+            querys.add(" og.designated_id = " + designated_id + " ");
+        }
+
+        DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        if (orderStatusArray != null && orderStatusArray.size() > 0) {
+            querys.add(" o.order_status in (" + StringUtils.collectionToDelimitedString(orderStatusArray, ",") + ") ");
+        }
+        querys.add(" o.deleted = 0 and og.deleted = 0 ");
+        String query = StringUtils.collectionToDelimitedString(querys, "and");
+        String orderByClause = null;
+        if (!StringUtils.isEmpty(sort) && !StringUtils.isEmpty(order)) {
+            orderByClause = "o." + sort + " " + order +", o.id desc ";
+        }
+
+        PageHelper.startPage(page, limit);
+        Page<Map> list1 = (Page) orderMapper.getOrderIds(query, orderByClause);
+        List<Integer> ids = new ArrayList<>();
+        for (Map map : list1) {
+            Integer id = (Integer) map.get("id");
+            ids.add(id);
+        }
+
+        List<OrderVo> list2 = new ArrayList<>();
+        if (!ids.isEmpty()) {
+            querys.add(" o.id in (" + StringUtils.collectionToDelimitedString(ids, ",") + ") ");
+            query = StringUtils.collectionToDelimitedString(querys, "and");
+            list2 = orderMapper.getOrderList(query, orderByClause);
+        }
+        Map<String, Object> data = new HashMap<String, Object>(5);
+        data.put("list", list2);
+        data.put("total", list1.getTotal());
+        data.put("page", list1.getPageNum());
+        data.put("limit", list1.getPageSize());
+        data.put("pages", list1.getPages());
+        return data;
+    }
 }
