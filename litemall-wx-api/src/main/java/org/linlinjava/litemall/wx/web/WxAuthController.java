@@ -100,6 +100,7 @@ public class WxAuthController {
         userInfo.setUserName(username);
         userInfo.setAvatarUrl(user.getAvatar());
         userInfo.setMobile(user.getMobile());
+        userInfo.setRole(user.getRole());
 
         // token
         String token = UserTokenManager.generateToken(user.getId());
@@ -166,6 +167,7 @@ public class WxAuthController {
             wxOrderService.giftTicket(user.getId());
 
             userInfo.setUserName(username);
+            userInfo.setRole(user.getRole());
         } else {
             user.setLastLoginTime(LocalDateTime.now());
             user.setLastLoginIp(IpUtil.getIpAddr(request));
@@ -177,6 +179,7 @@ public class WxAuthController {
             userInfo.setUserName(user.getUsername());
             userInfo.setNickName(user.getNickname());
             userInfo.setAvatarUrl(user.getAvatar());
+            userInfo.setRole(user.getRole());
         }
 
         // token
@@ -257,6 +260,7 @@ public class WxAuthController {
             userInfo.setNickName(user.getNickname());
             userInfo.setAvatarUrl(user.getAvatar());
             userInfo.setMobile(user.getMobile());
+            userInfo.setRole(user.getRole());
         } else {
             user.setLastLoginTime(LocalDateTime.now());
             user.setLastLoginIp(IpUtil.getIpAddr(request));
@@ -269,6 +273,7 @@ public class WxAuthController {
             userInfo.setNickName(user.getNickname());
             userInfo.setAvatarUrl(user.getAvatar());
             userInfo.setMobile(user.getMobile());
+            userInfo.setRole(user.getRole());
         }
 
         // token

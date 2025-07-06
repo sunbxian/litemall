@@ -1,0 +1,24 @@
+<view class="container"> 
+  <view class="no-order" wx:if="{{orderList.length <= 0}}">
+    <view class="c">
+      <text>还没有任何水票呢</text>
+    </view>
+  </view>
+  <view wx:else>
+    <view class="unselect" bindtap='unselectOrder'>不选择电子水票</view>
+  </view>
+  <view class="orders">  
+    <view class="order" wx:for="{{orderList}}" wx:for-item="item" wx:key="id"  data-id="{{item.id}}" bindtap="selectOrder"> 
+      <view class="goods" wx:for="{{item.goodsList}}" wx:key="id" wx:for-item="gitem">
+        <view class="img">
+          <image src="{{gitem.picUrl}}"></image>
+        </view>
+        <view class="info">
+          <text class="name">{{gitem.goodsName}}</text>
+          <text class="number">共：{{gitem.ticketCount}}桶， 还剩：{{item.ticketCount}}</text>
+        </view>
+        <view class="status"></view>
+      </view> 
+    </view>
+  </view>
+</view>

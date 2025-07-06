@@ -8,6 +8,7 @@ public class UserInfo {
     private String country;
     private String province;
     private String city;
+    private String role;
 
     private String language;
     private Byte gender;
@@ -84,4 +85,11 @@ public class UserInfo {
         this.mobile = mobile;
     }
 
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
 }

@@ -63,7 +63,7 @@
           <view class="info">
             <text class="name">{{iitem.name}}</text>
             <text class="desc">{{iitem.brief}}</text>
-            <text class="original-price">原价: ￥{{iitem.counterPrice}}</text>
+            <text wx:if="{{iitem.counterPrice != iitem.retailPrice}}" class="original-price">原价: ￥{{iitem.counterPrice}}</text>
             <text class="price">
               <text class="currency">现价: ￥</text>
               <text class="amount">{{iitem.retailPrice}}</text>

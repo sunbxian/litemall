@@ -65,7 +65,27 @@ public class WxOrderController {
         return wxOrderService.listType(userId, showType, type, page, limit, sort, order);
     }
 
-
+    /**
+     * 配送员代办订单列表
+     *
+     * @param userId   用户ID
+     * @param showType 显示类型，如果是0则是全部订单
+     * @param page     分页页数
+     * @param limit     分页大小
+     * @param sort     排序字段
+     * @param order     排序方式
+     * @return 订单列表
+     */
+    @GetMapping("listGrab")
+    public Object listGrab(@LoginUser Integer userId,
+                           @RequestParam(defaultValue = "0") Integer showType,
+                           @RequestParam(defaultValue = "0") Integer type,
+                           @RequestParam(defaultValue = "1") Integer page,
+                           @RequestParam(defaultValue = "10") Integer limit,
+                           @Sort @RequestParam(defaultValue = "add_time") String sort,
+                           @Order @RequestParam(defaultValue = "desc") String order) {
+        return wxOrderService.listGrab(userId, showType, type, page, limit, sort, order);
+    }
     /**
      * 订单详情
      *
