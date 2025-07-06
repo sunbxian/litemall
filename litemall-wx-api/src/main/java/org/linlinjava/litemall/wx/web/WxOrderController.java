@@ -43,6 +43,28 @@ public class WxOrderController {
                        @Order @RequestParam(defaultValue = "desc") String order) {
         return wxOrderService.list(userId, showType, page, limit, sort, order);
     }
+    /**
+     * 订单列表
+     *
+     * @param userId   用户ID
+     * @param showType 显示类型，如果是0则是全部订单
+     * @param page     分页页数
+     * @param limit     分页大小
+     * @param sort     排序字段
+     * @param order     排序方式
+     * @return 订单列表
+     */
+    @GetMapping("listType")
+    public Object listType(@LoginUser Integer userId,
+                       @RequestParam(defaultValue = "0") Integer showType,
+                       @RequestParam(defaultValue = "0") Integer type,
+                       @RequestParam(defaultValue = "1") Integer page,
+                       @RequestParam(defaultValue = "10") Integer limit,
+                       @Sort @RequestParam(defaultValue = "add_time") String sort,
+                       @Order @RequestParam(defaultValue = "desc") String order) {
+        return wxOrderService.listType(userId, showType, type, page, limit, sort, order);
+    }
+
 
     /**
      * 订单详情
@@ -60,7 +82,7 @@ public class WxOrderController {
      * 提交订单
      *
      * @param userId 用户ID
-     * @param body   订单信息，{ cartId：xxx, addressId: xxx, couponId: xxx, message: xxx, grouponRulesId: xxx,  grouponLinkId: xxx}
+     * @param body   订单信息，{ cartId：xxx, addressId: xxx, couponId: xxx, message: xxx, grouponRulesId: xxx,  grouponLinkId: xxx, orderId: xxx }
      * @return 提交订单操作结果
      */
     @PostMapping("submit")

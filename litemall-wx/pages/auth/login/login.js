@@ -78,9 +78,40 @@ Page({
       });
     });
   },
+  doLoginPhone: function(phone) {
+    user.checkLogin().catch(() => {
+      user.loginByWxPhone(phone).then(res => {
+        app.globalData.hasLogin = true;
+        this.setData({ wxLoading: false });
+        wx.navigateBack({
+          delta: 1
+        })
+      }).catch((err) => {
+        app.globalData.hasLogin = false;
+        this.setData({ wxLoading: false });
+        util.showErrorToast('微信登录手机失败');
+      });
+    });
+  },
   accountLogin: function() {
     wx.navigateTo({
       url: "/pages/auth/accountLogin/accountLogin"
     });
-  }
+  },
+  phoneLogin: function(e) {
+    if (e.detail.errMsg !== "getPhoneNumber:ok") {
+      // 拒绝授权
+      return;
+    }
+    console.log("获取手机号成功", e.detail);
+
+    if (this.data.wxLoading) return; // 防止重复点击
+
+    this.setData({
+      wxLoading: true
+    });
+
+    this.doLoginPhone(e.detail)
+
+  },
 })

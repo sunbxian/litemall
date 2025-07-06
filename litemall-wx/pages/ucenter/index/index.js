@@ -112,6 +112,28 @@ Page({
       });
     };
   },
+  goTicket() {
+    if (this.data.hasLogin) {
+      wx.navigateTo({
+        url: "/pages/ucenter/ticket/ticket"
+      });
+    } else {
+      wx.navigateTo({
+        url: "/pages/auth/login/login"
+      });
+    };
+  },
+  goDeposit() {
+    if (this.data.hasLogin) {
+      wx.navigateTo({
+        url: "/pages/ucenter/deposit/deposit"
+      });
+    } else {
+      wx.navigateTo({
+        url: "/pages/auth/login/login"
+      });
+    };
+  },
   goGroupon() {
     if (this.data.hasLogin) {
       wx.navigateTo({

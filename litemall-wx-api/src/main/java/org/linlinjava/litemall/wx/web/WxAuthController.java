@@ -18,6 +18,7 @@ import org.linlinjava.litemall.wx.dto.UserInfo;
 import org.linlinjava.litemall.wx.dto.WxLoginInfo;
 import org.linlinjava.litemall.wx.service.CaptchaCodeManager;
 import org.linlinjava.litemall.wx.service.UserTokenManager;
+import org.linlinjava.litemall.wx.service.WxOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
@@ -52,6 +53,9 @@ public class WxAuthController {
 
     @Autowired
     private CouponAssignService couponAssignService;
+
+    @Autowired
+    private WxOrderService wxOrderService;
 
     /**
      * 账号登录
@@ -95,6 +99,7 @@ public class WxAuthController {
         userInfo.setNickName(user.getNickname());
         userInfo.setUserName(username);
         userInfo.setAvatarUrl(user.getAvatar());
+        userInfo.setMobile(user.getMobile());
 
         // token
         String token = UserTokenManager.generateToken(user.getId());
@@ -158,6 +163,7 @@ public class WxAuthController {
 
             // 新用户发送注册优惠券
             couponAssignService.assignForRegister(user.getId());
+            wxOrderService.giftTicket(user.getId());
 
             userInfo.setUserName(username);
         } else {
@@ -182,6 +188,97 @@ public class WxAuthController {
         return ResponseUtil.ok(result);
     }
 
+
+    /**
+     * 微信手机快速登录
+     *
+     * @param body 请求内容，{ code: xxx, iv: xxx, encryptedData: xxx }
+     * @param request     请求对象
+     * @return 登录结果
+     */
+    @PostMapping("login_by_wx_phone")
+    public Object loginByWxPhone(@RequestBody String body, HttpServletRequest request) {
+        String encryptedData = JacksonUtil.parseString(body, "encryptedData");
+        String iv = JacksonUtil.parseString(body, "iv");
+        String code = JacksonUtil.parseString(body, "code");
+
+        if (code == null || iv == null || encryptedData == null) {
+            return ResponseUtil.badArgument();
+        }
+
+        String sessionKey = null;
+        String openId = null;
+        String phone = "";
+        try {
+            WxMaJscode2SessionResult result = this.wxService.getUserService().getSessionInfo(code);
+            sessionKey = result.getSessionKey();
+            openId = result.getOpenid();
+
+            WxMaPhoneNumberInfo phoneNumberInfo = this.wxService.getUserService().getPhoneNoInfo(sessionKey, encryptedData, iv);
+            phone = phoneNumberInfo.getPhoneNumber();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if (sessionKey == null || openId == null) {
+            return ResponseUtil.fail();
+        }
+
+        // userInfo
+        UserInfo userInfo = new UserInfo();
+        LitemallUser user = userService.queryByOid(openId);
+        if (user == null) {
+            String username;
+            do {
+                username = RandomStringUtils.randomAlphanumeric(7);
+            } while (!userService.queryByUsername(username).isEmpty());
+
+            user = new LitemallUser();
+            user.setUsername(username);
+            user.setPassword(openId);
+            user.setWeixinOpenid(openId);
+            user.setAvatar("https://yanxuan.nosdn.127.net/80841d741d7fa3073e0ae27bf487339f.jpg?imageView&quality=90&thumbnail=64x64");
+            user.setNickname("微信用户");
+            user.setGender((byte) 0);
+            user.setUserLevel((byte) 0);
+            user.setStatus((byte) 0);
+            user.setMobile(phone);
+            user.setLastLoginTime(LocalDateTime.now());
+            user.setLastLoginIp(IpUtil.getIpAddr(request));
+            user.setSessionKey(sessionKey);
+
+            userService.add(user);
+
+            // 新用户发送注册优惠券
+            couponAssignService.assignForRegister(user.getId());
+            wxOrderService.giftTicket(user.getId());
+
+            userInfo.setUserName(user.getUsername());
+            userInfo.setNickName(user.getNickname());
+            userInfo.setAvatarUrl(user.getAvatar());
+            userInfo.setMobile(user.getMobile());
+        } else {
+            user.setLastLoginTime(LocalDateTime.now());
+            user.setLastLoginIp(IpUtil.getIpAddr(request));
+            user.setSessionKey(sessionKey);
+            if (userService.updateById(user) == 0) {
+                return ResponseUtil.updatedDataFailed();
+            }
+
+            userInfo.setUserName(user.getUsername());
+            userInfo.setNickName(user.getNickname());
+            userInfo.setAvatarUrl(user.getAvatar());
+            userInfo.setMobile(user.getMobile());
+        }
+
+        // token
+        String token = UserTokenManager.generateToken(user.getId());
+
+        Map<Object, Object> result = new HashMap<Object, Object>();
+        result.put("token", token);
+        result.put("userInfo", userInfo);
+        return ResponseUtil.ok(result);
+    }
 
     /**
      * 请求注册验证码
@@ -318,6 +415,7 @@ public class WxAuthController {
 
         // 给新用户发送注册优惠券
         couponAssignService.assignForRegister(user.getId());
+        wxOrderService.giftTicket(user.getId());
 
         // userInfo
         UserInfo userInfo = new UserInfo();

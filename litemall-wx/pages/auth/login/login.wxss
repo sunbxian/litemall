@@ -60,6 +60,21 @@
   background-image: linear-gradient(to right, #9a9ba1 0%, #9a9ba1 100%);
 }
 
+.phone-login-btn {
+  width: 90%;
+  margin: 0 auto;
+  color: #fff;
+  font-size: 30rpx;
+  height: 96rpx;
+  line-height: 96rpx;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50rpx;
+  background-image: linear-gradient(to right, #4caf50 0%, #4caf50 100%);
+  letter-spacing: 3rpx;
+}
+
 .loading-icon {
   width: 40rpx;
   height: 40rpx;

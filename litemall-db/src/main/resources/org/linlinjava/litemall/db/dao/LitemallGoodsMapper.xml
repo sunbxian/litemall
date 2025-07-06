@@ -23,6 +23,10 @@
     <result column="unit" jdbcType="VARCHAR" property="unit" />
     <result column="counter_price" jdbcType="DECIMAL" property="counterPrice" />
     <result column="retail_price" jdbcType="DECIMAL" property="retailPrice" />
+    <result column="type" jdbcType="INTEGER" property="type" />
+    <result column="designated_id" jdbcType="INTEGER" property="designatedId" />
+    <result column="ticket_count" jdbcType="INTEGER" property="ticketCount" />
+    <result column="ticket_gift_count" jdbcType="INTEGER" property="ticketGiftCount" />
     <result column="add_time" jdbcType="TIMESTAMP" property="addTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
     <result column="deleted" jdbcType="BIT" property="deleted" />
@@ -145,7 +149,7 @@
     -->
     id, goods_sn, `name`, category_id, brand_id, gallery, keywords, brief, is_on_sale, 
     sort_order, pic_url, share_url, is_new, is_hot, unit, counter_price, retail_price, 
-    add_time, update_time, deleted
+    `type`, designated_id, ticket_count, ticket_gift_count, add_time, update_time, deleted
   </sql>
   <sql id="Blob_Column_List">
     <!--
@@ -306,15 +310,19 @@
       keywords, brief, is_on_sale, 
       sort_order, pic_url, share_url, 
       is_new, is_hot, unit, counter_price, 
-      retail_price, add_time, update_time, 
-      deleted, detail)
+      retail_price, `type`, designated_id, 
+      ticket_count, ticket_gift_count, add_time, 
+      update_time, deleted, detail
+      )
     values (#{goodsSn,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{categoryId,jdbcType=INTEGER}, 
       #{brandId,jdbcType=INTEGER}, #{gallery,jdbcType=VARCHAR,typeHandler=org.linlinjava.litemall.db.mybatis.JsonStringArrayTypeHandler}, 
       #{keywords,jdbcType=VARCHAR}, #{brief,jdbcType=VARCHAR}, #{isOnSale,jdbcType=BIT}, 
       #{sortOrder,jdbcType=SMALLINT}, #{picUrl,jdbcType=VARCHAR}, #{shareUrl,jdbcType=VARCHAR}, 
       #{isNew,jdbcType=BIT}, #{isHot,jdbcType=BIT}, #{unit,jdbcType=VARCHAR}, #{counterPrice,jdbcType=DECIMAL}, 
-      #{retailPrice,jdbcType=DECIMAL}, #{addTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
-      #{deleted,jdbcType=BIT}, #{detail,jdbcType=LONGVARCHAR})
+      #{retailPrice,jdbcType=DECIMAL}, #{type,jdbcType=INTEGER}, #{designatedId,jdbcType=INTEGER}, 
+      #{ticketCount,jdbcType=INTEGER}, #{ticketGiftCount,jdbcType=INTEGER}, #{addTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP}, #{deleted,jdbcType=BIT}, #{detail,jdbcType=LONGVARCHAR}
+      )
   </insert>
   <insert id="insertSelective" parameterType="org.linlinjava.litemall.db.domain.LitemallGoods">
     <!--
@@ -373,6 +381,18 @@
       </if>
       <if test="retailPrice != null">
         retail_price,
+      </if>
+      <if test="type != null">
+        `type`,
+      </if>
+      <if test="designatedId != null">
+        designated_id,
+      </if>
+      <if test="ticketCount != null">
+        ticket_count,
+      </if>
+      <if test="ticketGiftCount != null">
+        ticket_gift_count,
       </if>
       <if test="addTime != null">
         add_time,
@@ -435,6 +455,18 @@
       </if>
       <if test="retailPrice != null">
         #{retailPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="type != null">
+        #{type,jdbcType=INTEGER},
+      </if>
+      <if test="designatedId != null">
+        #{designatedId,jdbcType=INTEGER},
+      </if>
+      <if test="ticketCount != null">
+        #{ticketCount,jdbcType=INTEGER},
+      </if>
+      <if test="ticketGiftCount != null">
+        #{ticketGiftCount,jdbcType=INTEGER},
       </if>
       <if test="addTime != null">
         #{addTime,jdbcType=TIMESTAMP},
@@ -518,6 +550,18 @@
       <if test="record.retailPrice != null">
         retail_price = #{record.retailPrice,jdbcType=DECIMAL},
       </if>
+      <if test="record.type != null">
+        `type` = #{record.type,jdbcType=INTEGER},
+      </if>
+      <if test="record.designatedId != null">
+        designated_id = #{record.designatedId,jdbcType=INTEGER},
+      </if>
+      <if test="record.ticketCount != null">
+        ticket_count = #{record.ticketCount,jdbcType=INTEGER},
+      </if>
+      <if test="record.ticketGiftCount != null">
+        ticket_gift_count = #{record.ticketGiftCount,jdbcType=INTEGER},
+      </if>
       <if test="record.addTime != null">
         add_time = #{record.addTime,jdbcType=TIMESTAMP},
       </if>
@@ -558,6 +602,10 @@
       unit = #{record.unit,jdbcType=VARCHAR},
       counter_price = #{record.counterPrice,jdbcType=DECIMAL},
       retail_price = #{record.retailPrice,jdbcType=DECIMAL},
+      `type` = #{record.type,jdbcType=INTEGER},
+      designated_id = #{record.designatedId,jdbcType=INTEGER},
+      ticket_count = #{record.ticketCount,jdbcType=INTEGER},
+      ticket_gift_count = #{record.ticketGiftCount,jdbcType=INTEGER},
       add_time = #{record.addTime,jdbcType=TIMESTAMP},
       update_time = #{record.updateTime,jdbcType=TIMESTAMP},
       deleted = #{record.deleted,jdbcType=BIT},
@@ -589,6 +637,10 @@
       unit = #{record.unit,jdbcType=VARCHAR},
       counter_price = #{record.counterPrice,jdbcType=DECIMAL},
       retail_price = #{record.retailPrice,jdbcType=DECIMAL},
+      `type` = #{record.type,jdbcType=INTEGER},
+      designated_id = #{record.designatedId,jdbcType=INTEGER},
+      ticket_count = #{record.ticketCount,jdbcType=INTEGER},
+      ticket_gift_count = #{record.ticketGiftCount,jdbcType=INTEGER},
       add_time = #{record.addTime,jdbcType=TIMESTAMP},
       update_time = #{record.updateTime,jdbcType=TIMESTAMP},
       deleted = #{record.deleted,jdbcType=BIT}
@@ -651,6 +703,18 @@
       <if test="retailPrice != null">
         retail_price = #{retailPrice,jdbcType=DECIMAL},
       </if>
+      <if test="type != null">
+        `type` = #{type,jdbcType=INTEGER},
+      </if>
+      <if test="designatedId != null">
+        designated_id = #{designatedId,jdbcType=INTEGER},
+      </if>
+      <if test="ticketCount != null">
+        ticket_count = #{ticketCount,jdbcType=INTEGER},
+      </if>
+      <if test="ticketGiftCount != null">
+        ticket_gift_count = #{ticketGiftCount,jdbcType=INTEGER},
+      </if>
       <if test="addTime != null">
         add_time = #{addTime,jdbcType=TIMESTAMP},
       </if>
@@ -688,6 +752,10 @@
       unit = #{unit,jdbcType=VARCHAR},
       counter_price = #{counterPrice,jdbcType=DECIMAL},
       retail_price = #{retailPrice,jdbcType=DECIMAL},
+      `type` = #{type,jdbcType=INTEGER},
+      designated_id = #{designatedId,jdbcType=INTEGER},
+      ticket_count = #{ticketCount,jdbcType=INTEGER},
+      ticket_gift_count = #{ticketGiftCount,jdbcType=INTEGER},
       add_time = #{addTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP},
       deleted = #{deleted,jdbcType=BIT},
@@ -716,6 +784,10 @@
       unit = #{unit,jdbcType=VARCHAR},
       counter_price = #{counterPrice,jdbcType=DECIMAL},
       retail_price = #{retailPrice,jdbcType=DECIMAL},
+      `type` = #{type,jdbcType=INTEGER},
+      designated_id = #{designatedId,jdbcType=INTEGER},
+      ticket_count = #{ticketCount,jdbcType=INTEGER},
+      ticket_gift_count = #{ticketGiftCount,jdbcType=INTEGER},
       add_time = #{addTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP},
       deleted = #{deleted,jdbcType=BIT}

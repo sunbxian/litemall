@@ -34,6 +34,8 @@
     <result column="refund_time" jdbcType="TIMESTAMP" property="refundTime" />
     <result column="confirm_time" jdbcType="TIMESTAMP" property="confirmTime" />
     <result column="comments" jdbcType="SMALLINT" property="comments" />
+    <result column="type" jdbcType="INTEGER" property="type" />
+    <result column="ticket_count" jdbcType="INTEGER" property="ticketCount" />
     <result column="end_time" jdbcType="TIMESTAMP" property="endTime" />
     <result column="add_time" jdbcType="TIMESTAMP" property="addTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
@@ -114,7 +116,7 @@
     message, goods_price, freight_price, coupon_price, integral_price, groupon_price, 
     order_price, actual_price, pay_id, pay_time, ship_sn, grab_user_id, ship_channel, 
     ship_time, refund_amount, refund_type, refund_content, refund_time, confirm_time, 
-    comments, end_time, add_time, update_time, deleted
+    comments, `type`, ticket_count, end_time, add_time, update_time, deleted
   </sql>
   <select id="selectByExample" parameterType="org.linlinjava.litemall.db.domain.LitemallOrderExample" resultMap="BaseResultMap">
     <!--
@@ -244,8 +246,9 @@
       grab_user_id, ship_channel, ship_time, 
       refund_amount, refund_type, refund_content, 
       refund_time, confirm_time, comments, 
-      end_time, add_time, update_time, 
-      deleted)
+      `type`, ticket_count, end_time, 
+      add_time, update_time, deleted
+      )
     values (#{userId,jdbcType=INTEGER}, #{orderSn,jdbcType=VARCHAR}, #{orderStatus,jdbcType=SMALLINT}, 
       #{aftersaleStatus,jdbcType=SMALLINT}, #{consignee,jdbcType=VARCHAR}, #{mobile,jdbcType=VARCHAR}, 
       #{address,jdbcType=VARCHAR}, #{message,jdbcType=VARCHAR}, #{goodsPrice,jdbcType=DECIMAL}, 
@@ -255,8 +258,9 @@
       #{grabUserId,jdbcType=INTEGER}, #{shipChannel,jdbcType=VARCHAR}, #{shipTime,jdbcType=TIMESTAMP}, 
       #{refundAmount,jdbcType=DECIMAL}, #{refundType,jdbcType=VARCHAR}, #{refundContent,jdbcType=VARCHAR}, 
       #{refundTime,jdbcType=TIMESTAMP}, #{confirmTime,jdbcType=TIMESTAMP}, #{comments,jdbcType=SMALLINT}, 
-      #{endTime,jdbcType=TIMESTAMP}, #{addTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
-      #{deleted,jdbcType=BIT})
+      #{type,jdbcType=INTEGER}, #{ticketCount,jdbcType=INTEGER}, #{endTime,jdbcType=TIMESTAMP}, 
+      #{addTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{deleted,jdbcType=BIT}
+      )
   </insert>
   <insert id="insertSelective" parameterType="org.linlinjava.litemall.db.domain.LitemallOrder">
     <!--
@@ -348,6 +352,12 @@
       </if>
       <if test="comments != null">
         comments,
+      </if>
+      <if test="type != null">
+        `type`,
+      </if>
+      <if test="ticketCount != null">
+        ticket_count,
       </if>
       <if test="endTime != null">
         end_time,
@@ -443,6 +453,12 @@
       </if>
       <if test="comments != null">
         #{comments,jdbcType=SMALLINT},
+      </if>
+      <if test="type != null">
+        #{type,jdbcType=INTEGER},
+      </if>
+      <if test="ticketCount != null">
+        #{ticketCount,jdbcType=INTEGER},
       </if>
       <if test="endTime != null">
         #{endTime,jdbcType=TIMESTAMP},
@@ -559,6 +575,12 @@
       <if test="record.comments != null">
         comments = #{record.comments,jdbcType=SMALLINT},
       </if>
+      <if test="record.type != null">
+        `type` = #{record.type,jdbcType=INTEGER},
+      </if>
+      <if test="record.ticketCount != null">
+        ticket_count = #{record.ticketCount,jdbcType=INTEGER},
+      </if>
       <if test="record.endTime != null">
         end_time = #{record.endTime,jdbcType=TIMESTAMP},
       </if>
@@ -610,6 +632,8 @@
       refund_time = #{record.refundTime,jdbcType=TIMESTAMP},
       confirm_time = #{record.confirmTime,jdbcType=TIMESTAMP},
       comments = #{record.comments,jdbcType=SMALLINT},
+      `type` = #{record.type,jdbcType=INTEGER},
+      ticket_count = #{record.ticketCount,jdbcType=INTEGER},
       end_time = #{record.endTime,jdbcType=TIMESTAMP},
       add_time = #{record.addTime,jdbcType=TIMESTAMP},
       update_time = #{record.updateTime,jdbcType=TIMESTAMP},
@@ -706,6 +730,12 @@
       <if test="comments != null">
         comments = #{comments,jdbcType=SMALLINT},
       </if>
+      <if test="type != null">
+        `type` = #{type,jdbcType=INTEGER},
+      </if>
+      <if test="ticketCount != null">
+        ticket_count = #{ticketCount,jdbcType=INTEGER},
+      </if>
       <if test="endTime != null">
         end_time = #{endTime,jdbcType=TIMESTAMP},
       </if>
@@ -754,6 +784,8 @@
       refund_time = #{refundTime,jdbcType=TIMESTAMP},
       confirm_time = #{confirmTime,jdbcType=TIMESTAMP},
       comments = #{comments,jdbcType=SMALLINT},
+      `type` = #{type,jdbcType=INTEGER},
+      ticket_count = #{ticketCount,jdbcType=INTEGER},
       end_time = #{endTime,jdbcType=TIMESTAMP},
       add_time = #{addTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP},

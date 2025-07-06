@@ -1,10 +1,10 @@
 {
-  "pages": [ 
-    "pages/test/test", 
+  "pages": [
+    "pages/test/test",
     "pages/index/index",
     "pages/catalog/catalog",
     "pages/newGoods/newGoods",
-    "pages/hotGoods/hotGoods", 
+    "pages/hotGoods/hotGoods",
     "pages/ucenter/index/index",
     "pages/ucenter/address/address",
     "pages/ucenter/addressAdd/addressAdd",
@@ -42,7 +42,9 @@
     "pages/ucenter/aftersale/aftersale",
     "pages/ucenter/aftersaleList/aftersaleList",
     "pages/ucenter/aftersaleDetail/aftersaleDetail",
-    "pages/ucenter/userInfo/userInfo" 
+    "pages/ucenter/userInfo/userInfo",
+    "pages/ucenter/ticket/ticket",
+    "pages/ucenter/deposit/deposit"
   ],
   "window": {
     "navigationBarBackgroundColor": "#FFFFFF",
@@ -63,7 +65,7 @@
         "iconPath": "static/images/home.png",
         "selectedIconPath": "static/images/home@selected.png",
         "text": "首页"
-      }, 
+      },
       {
         "pagePath": "pages/cart/cart",
         "iconPath": "static/images/cart.png",

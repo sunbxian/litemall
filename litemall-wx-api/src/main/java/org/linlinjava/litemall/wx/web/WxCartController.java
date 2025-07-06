@@ -156,6 +156,10 @@ public class WxCartController {
             cart.setSpecifications(product.getSpecifications());
             cart.setUserId(userId);
             cart.setChecked(true);
+            cart.setType(goods.getType());
+            cart.setDesignatedId(goods.getDesignatedId());
+            cart.setTicketCount(goods.getTicketCount());
+            cart.setTicketGiftCount(goods.getTicketGiftCount());
             cartService.add(cart);
         } else {
             //取得规格的信息,判断规格库存
@@ -230,6 +234,10 @@ public class WxCartController {
             cart.setSpecifications(product.getSpecifications());
             cart.setUserId(userId);
             cart.setChecked(true);
+            cart.setType(goods.getType());
+            cart.setDesignatedId(goods.getDesignatedId());
+            cart.setTicketCount(goods.getTicketCount());
+            cart.setTicketGiftCount(goods.getTicketGiftCount());
             cartService.add(cart);
         } else {
             //取得规格的信息,判断规格库存

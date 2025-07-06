@@ -101,6 +101,22 @@
         <el-form-item :label="$t('goods_edit.form.detail')">
           <editor v-model="goods.detail" :init="editorInit" />
         </el-form-item>
+
+        <el-form-item :label="$t('goods_edit.form.type')" prop="type">
+          <el-input v-model="goods.type" />
+        </el-form-item>
+
+        <el-form-item :label="$t('goods_edit.form.designated_good')" prop="designatedId">
+          <el-input v-model="goods.designatedId" />
+        </el-form-item>
+
+        <el-form-item :label="$t('goods_edit.form.ticket_count')" prop="ticketCount">
+          <el-input v-model="goods.ticketCount" />
+        </el-form-item>
+
+        <el-form-item :label="$t('goods_edit.form.ticket_gift_count')" prop="ticketGiftCount">
+          <el-input v-model="goods.ticketGiftCount" />
+        </el-form-item>
       </el-form>
     </el-card>
 

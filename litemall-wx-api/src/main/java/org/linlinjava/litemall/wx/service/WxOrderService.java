@@ -107,6 +107,8 @@ public class WxOrderService {
     private TaskService taskService;
     @Autowired
     private LitemallAftersaleService aftersaleService;
+    @Autowired
+    private LitemallGoodsService goodsService;
 
     /**
      * 订单列表
@@ -157,6 +159,71 @@ public class WxOrderService {
                 orderGoodsVo.put("picUrl", orderGoods.getPicUrl());
                 orderGoodsVo.put("specifications", orderGoods.getSpecifications());
                 orderGoodsVo.put("price",orderGoods.getPrice());
+                orderGoodsVoList.add(orderGoodsVo);
+            }
+            orderVo.put("goodsList", orderGoodsVoList);
+
+            orderVoList.add(orderVo);
+        }
+
+        return ResponseUtil.okList(orderVoList, orderList);
+    }
+
+    /**
+     * 订单列表
+     *
+     * @param userId   用户ID
+     * @param showType 订单信息：
+     *                 0，全部订单；
+     *                 1，待付款；
+     *                 2，待发货；
+     *                 3，待收货；
+     *                 4，待评价。
+     * @param type    订单类型
+     * @param page     分页页数
+     * @param limit     分页大小
+     * @return 订单列表
+     */
+    public Object listType(Integer userId, Integer showType, Integer type, Integer page, Integer limit, String sort, String order) {
+        if (userId == null) {
+            return ResponseUtil.unlogin();
+        }
+
+        List<Short> orderStatus = OrderUtil.orderStatus(showType);
+        List<LitemallOrder> orderList = orderService.queryByOrderStatusAndType(userId, orderStatus, type, page, limit, sort, order);
+
+        List<Map<String, Object>> orderVoList = new ArrayList<>(orderList.size());
+        for (LitemallOrder o : orderList) {
+            Map<String, Object> orderVo = new HashMap<>();
+            orderVo.put("id", o.getId());
+            orderVo.put("orderSn", o.getOrderSn());
+            orderVo.put("actualPrice", o.getActualPrice());
+            orderVo.put("orderStatusText", OrderUtil.orderStatusText(o));
+            orderVo.put("handleOption", OrderUtil.build(o));
+            orderVo.put("aftersaleStatus", o.getAftersaleStatus());
+            orderVo.put("type", o.getType());
+            orderVo.put("ticketCount", o.getTicketCount());
+            LitemallGroupon groupon = grouponService.queryByOrderId(o.getId());
+            if (groupon != null) {
+                orderVo.put("isGroupin", true);
+            } else {
+                orderVo.put("isGroupin", false);
+            }
+
+            List<LitemallOrderGoods> orderGoodsList = orderGoodsService.queryByOid(o.getId());
+            List<Map<String, Object>> orderGoodsVoList = new ArrayList<>(orderGoodsList.size());
+            for (LitemallOrderGoods orderGoods : orderGoodsList) {
+                Map<String, Object> orderGoodsVo = new HashMap<>();
+                orderGoodsVo.put("id", orderGoods.getId());
+                orderGoodsVo.put("goodsName", orderGoods.getGoodsName());
+                orderGoodsVo.put("number", orderGoods.getNumber());
+                orderGoodsVo.put("picUrl", orderGoods.getPicUrl());
+                orderGoodsVo.put("specifications", orderGoods.getSpecifications());
+                orderGoodsVo.put("price",orderGoods.getPrice());
+                orderGoodsVo.put("type",orderGoods.getType());
+                orderGoodsVo.put("designatedId",orderGoods.getDesignatedId());
+                orderGoodsVo.put("ticketCount",orderGoods.getTicketCount());
+                orderGoodsVo.put("ticketGiftCount",orderGoods.getTicketGiftCount());
                 orderGoodsVoList.add(orderGoodsVo);
             }
             orderVo.put("goodsList", orderGoodsVoList);
@@ -241,7 +308,7 @@ public class WxOrderService {
      * 5. 如果是团购商品，则创建团购活动表项。
      *
      * @param userId 用户ID
-     * @param body   订单信息，{ cartId：xxx, addressId: xxx, couponId: xxx, message: xxx, grouponRulesId: xxx,  grouponLinkId: xxx}
+     * @param body   订单信息，{ cartId：xxx, addressId: xxx, couponId: xxx, message: xxx, grouponRulesId: xxx,  grouponLinkId: xxx, payTicketId: xxx }
      * @return 提交订单操作结果
      */
     @Transactional
@@ -259,6 +326,7 @@ public class WxOrderService {
         String message = JacksonUtil.parseString(body, "message");
         Integer grouponRulesId = JacksonUtil.parseInteger(body, "grouponRulesId");
         Integer grouponLinkId = JacksonUtil.parseInteger(body, "grouponLinkId");
+        Integer payTicketId = JacksonUtil.parseInteger(body, "payTicketId");
 
         //如果是团购项目,验证活动是否有效
         if (grouponRulesId != null && grouponRulesId > 0) {
@@ -311,6 +379,11 @@ public class WxOrderService {
             return ResponseUtil.badArgument();
         }
 
+        LitemallOrder payTicket = null;
+        if (payTicketId != null) {
+            payTicket = orderService.findById(payTicketId);
+        }
+
         // 团购优惠
         BigDecimal grouponPrice = new BigDecimal(0);
         LitemallGrouponRules grouponRules = grouponRulesService.findById(grouponRulesId);
@@ -331,14 +404,28 @@ public class WxOrderService {
             return ResponseUtil.badArgumentValue();
         }
         BigDecimal checkedGoodsPrice = new BigDecimal(0);
+        int goodsCount = 0;
+
+        LitemallCart checkGoodsType0 = null;
         for (LitemallCart checkGoods : checkedGoodsList) {
+            checkGoodsType0 = checkGoods;
+
+            if (payTicket != null) {
+                if (checkGoods.getNumber() > payTicket.getTicketCount()) {
+                    goodsCount = checkGoods.getNumber() - payTicket.getTicketCount();
+                }
+            } else {
+                goodsCount = checkGoods.getNumber();
+            }
             //  只有当团购规格商品ID符合才进行团购优惠
             if (grouponRules != null && grouponRules.getGoodsId().equals(checkGoods.getGoodsId())) {
-                checkedGoodsPrice = checkedGoodsPrice.add(checkGoods.getPrice().subtract(grouponPrice).multiply(new BigDecimal(checkGoods.getNumber())));
+                checkedGoodsPrice = checkedGoodsPrice.add(checkGoods.getPrice().subtract(grouponPrice).multiply(new BigDecimal(goodsCount)));
             } else {
-                checkedGoodsPrice = checkedGoodsPrice.add(checkGoods.getPrice().multiply(new BigDecimal(checkGoods.getNumber())));
+                checkedGoodsPrice = checkedGoodsPrice.add(checkGoods.getPrice().multiply(new BigDecimal(goodsCount)));
             }
         }
+
+
 
         // 获取可用的优惠券信息
         // 使用优惠券减免的金额
@@ -385,6 +472,8 @@ public class WxOrderService {
         order.setIntegralPrice(integralPrice);
         order.setOrderPrice(orderTotalPrice);
         order.setActualPrice(actualPrice);
+        order.setType(checkGoodsType0.getType());
+        order.setTicketCount(checkGoodsType0.getTicketCount());
 
         // 有团购
         if (grouponRules != null) {
@@ -411,8 +500,22 @@ public class WxOrderService {
             orderGoods.setNumber(cartGoods.getNumber());
             orderGoods.setSpecifications(cartGoods.getSpecifications());
             orderGoods.setAddTime(LocalDateTime.now());
+            orderGoods.setDesignatedId(cartGoods.getDesignatedId());
+            orderGoods.setType(cartGoods.getType());
+            orderGoods.setTicketCount(cartGoods.getTicketCount());
+            orderGoods.setTicketGiftCount(cartGoods.getTicketGiftCount());
 
             orderGoodsService.add(orderGoods);
+
+            if (payTicket != null) {
+                int newTicketCount = 0;
+                if (cartGoods.getNumber() < payTicket.getTicketCount()) {
+                    newTicketCount = payTicket.getTicketCount() - cartGoods.getNumber();
+                }
+                payTicket.setTicketCount(newTicketCount);
+
+                orderService.updateSelective(payTicket);
+            }
         }
 
         // 删除购物车里面的商品信息
@@ -1069,4 +1172,76 @@ public class WxOrderService {
             couponUserService.update(couponUser);
         }
     }
+
+    /**
+     * 赠送水票
+     *
+     * @param userId 用户ID
+     * @return 提交订单操作结果
+     */
+    @Transactional
+    public Object giftTicket(Integer userId) {
+        if (userId == null) {
+            return ResponseUtil.unlogin();
+        }
+
+        Integer goodId = SystemConfig.getGiftTicket();
+        if (goodId == null || goodId <= 0) {
+            return ResponseUtil.fail(ORDER_INVALID_OPERATION, "水票赠送未配置");
+        }
+        // 检测是否有水票商品
+        LitemallGoods cartGoods = goodsService.findById(goodId);
+        if (cartGoods == null) {
+            return ResponseUtil.fail(ORDER_INVALID_OPERATION, "水票商品不存在");
+        }
+
+        Integer orderId = null;
+        LitemallOrder order = null;
+        // 订单
+        order = new LitemallOrder();
+        order.setUserId(userId);
+        order.setOrderSn(orderService.generateOrderSn(userId));
+        order.setOrderStatus(OrderUtil.STATUS_PAY);
+        order.setConsignee("水票赠送");
+        order.setMobile("");
+        order.setMessage("");
+        order.setAddress("");
+        order.setGoodsPrice(BigDecimal.valueOf(0));
+        order.setFreightPrice(BigDecimal.valueOf(0));
+        order.setCouponPrice(BigDecimal.valueOf(0));
+        order.setIntegralPrice(BigDecimal.valueOf(0));
+        order.setOrderPrice(BigDecimal.valueOf(0));
+        order.setActualPrice(BigDecimal.valueOf(0));
+        order.setType(2);
+        order.setTicketCount(cartGoods.getTicketCount());
+        order.setGrouponPrice(new BigDecimal(0));    //  团购价格
+
+        // 添加订单表项
+        orderService.add(order);
+        orderId = order.getId();
+
+        String[] specifications = new String[0];
+        // 添加订单商品表项
+        LitemallOrderGoods orderGoods = new LitemallOrderGoods();
+        orderGoods.setOrderId(order.getId());
+        orderGoods.setGoodsId(cartGoods.getId());
+        orderGoods.setGoodsSn(cartGoods.getGoodsSn());
+        orderGoods.setGoodsName(cartGoods.getName());
+        orderGoods.setPicUrl(cartGoods.getPicUrl());
+        orderGoods.setPrice(cartGoods.getCounterPrice());
+        orderGoods.setNumber((short) 1);
+        orderGoods.setSpecifications(specifications);
+        orderGoods.setAddTime(LocalDateTime.now());
+        orderGoods.setDesignatedId(cartGoods.getDesignatedId());
+        orderGoods.setType(cartGoods.getType());
+        orderGoods.setTicketCount(cartGoods.getTicketCount());
+        orderGoods.setTicketGiftCount(cartGoods.getTicketGiftCount());
+
+        orderGoodsService.add(orderGoods);
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("orderId", orderId);
+        return ResponseUtil.ok(data);
+    }
+
 }

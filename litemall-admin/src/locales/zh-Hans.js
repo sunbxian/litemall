@@ -494,7 +494,11 @@ export default {
       unit: '商品单位',
       keywords: '关键字',
       category_id: '类目ID',
-      brand_id: '品牌商ID'
+      brand_id: '品牌商ID',
+      type: '商品类型',
+      designated_good: '指定商品',
+      ticket_count: '水票数量',
+      ticket_gift_count: '赠送水票数量'
     },
     dialog: {
       detail: '商品详情'
@@ -559,6 +563,10 @@ export default {
       brand_id: '所属品牌商',
       brief: '商品简介',
       detail: '商品详细介绍',
+      type: '商品类型',
+      designated_good: '指定商品',
+      ticket_count: '水票数量',
+      ticket_gift_count: '赠送水票数量',
       specification_name: '规格名',
       specification_value: '规格值',
       specification_pic_url: '规格图片',
