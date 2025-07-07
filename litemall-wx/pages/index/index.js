@@ -3,7 +3,7 @@ var api = require('../../config/api.js');
 
 Page({
   data: {
-    bannerHeight: 132,       // banner高度
+    bannerHeight: 205,       // banner高度
     categoryHeight: 0,      // 分类列表高度
     isFixed: false,         // 是否固定分类
     fixedTop: 0,            // 固定定位的top值
@@ -45,17 +45,7 @@ Page({
     let that = this;
     util.request(api.GrabbersUrl).then(function(res) {
       if (res.errno === 0) {
-        const grabbers = res.data.list
-        // // 确保 grabbers 数据结构正确
-        // const grabbers = res.data.list.map(item => ({
-        //   id: item.id,
-        //   nickName: item.name || "未知配送员" // 如果 name 为空，设置默认值
-        // }));
-        grabbers.unshift({
-          id: 1,
-          nickName: "请选择配送员", // 添加一个默认选项
-          mobile: "15889707030"
-        }); // 添加一个空对象作为默认选项
+        const grabbers = res.data.list 
         that.setData({
           grabbers: grabbers
         });

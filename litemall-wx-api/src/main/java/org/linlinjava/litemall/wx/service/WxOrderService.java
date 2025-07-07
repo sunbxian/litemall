@@ -255,7 +255,7 @@ public class WxOrderService {
         }
 
         List<Short> orderStatus = OrderUtil.orderStatus(showType);
-        List<LitemallOrder> orderList = orderService.queryByOrderStatusAndType(userId, orderStatus, type, page, limit, sort, order);
+        List<LitemallOrder> orderList = orderService.queryByGrab(userId, orderStatus, type, page, limit, sort, order);
 
         List<Map<String, Object>> orderVoList = new ArrayList<>(orderList.size());
         for (LitemallOrder o : orderList) {
@@ -944,7 +944,12 @@ public class WxOrderService {
 
         order.setPayId(payId);
         order.setPayTime(LocalDateTime.now());
-        order.setOrderStatus(OrderUtil.STATUS_PAY);
+        if (order.getGrabUserId() != null) {
+            order.setOrderStatus(OrderUtil.STATUS_SHIP);
+        } else {
+            order.setOrderStatus(OrderUtil.STATUS_PAY);
+        }
+
         if (orderService.updateWithOptimisticLocker(order) == 0) {
             return WxPayNotifyResponse.fail("更新数据已失效");
         }

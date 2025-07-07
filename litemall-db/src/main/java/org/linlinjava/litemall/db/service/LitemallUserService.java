@@ -1,6 +1,7 @@
 package org.linlinjava.litemall.db.service;
 
 import com.github.pagehelper.PageHelper;
+import org.linlinjava.litemall.db.dao.GrabberMapper;
 import org.linlinjava.litemall.db.dao.LitemallUserMapper;
 import org.linlinjava.litemall.db.domain.LitemallUser;
 import org.linlinjava.litemall.db.domain.LitemallUserExample;
@@ -10,12 +11,17 @@ import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class LitemallUserService {
     @Resource
     private LitemallUserMapper userMapper;
+
+    @Resource
+    private GrabberMapper grabberMapper;
 
     public LitemallUser findById(Integer userId) {
         return userMapper.selectByPrimaryKey(userId);
@@ -105,5 +111,14 @@ public class LitemallUserService {
 
     public void deleteById(Integer id) {
         userMapper.logicalDeleteByPrimaryKey(id);
+    }
+
+    public Map<String, Object> queryUserAndAddress(String role) {
+        List<UserVo> list1 = grabberMapper.selectUserWithAddress();
+        Map<String, Object> data = new HashMap<String, Object>(5);
+        data.put("list", list1);
+        return data;
+
+
     }
 }

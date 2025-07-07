@@ -211,16 +211,7 @@ public class WxHomeController {
             @RequestParam(defaultValue = "10") Integer limit,
             @Sort @RequestParam(defaultValue = "add_time") String sort,
             @Order @RequestParam(defaultValue = "desc") String order) {
-        List<LitemallUser> userList = userService.querySelective("", "", "", "grabber", page, limit, sort, order);
-        List<UserInfo> userInfos = new ArrayList<>();
-        for (LitemallUser user : userList) {
-            UserInfo userInfo = new UserInfo();
-            userInfo.setAvatarUrl(user.getAvatar());
-            userInfo.setNickName(user.getNickname());
-            userInfo.setGender(user.getGender());
-            userInfo.setMobile(user.getMobile());
-            userInfos.add(userInfo);
-        }
-        return ResponseUtil.okList(userInfos);
+        Map<String, Object> userList =  userService.queryUserAndAddress(  "grabber" );
+        return ResponseUtil.ok(userList);
     }
 }

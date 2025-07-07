@@ -20,21 +20,7 @@
             <image src="{{item.url}}" background-size="cover"></image>
           </block>
         </swiper-item>
-      </swiper>
-      <view class="banner-text">
-        <!-- 上下滚动的 grabbers -->
-        <swiper
-          class="grabbers-swiper"
-          vertical="true"
-          autoplay="true"
-          interval="2000"
-          circular="true"
-        >
-          <swiper-item wx:for="{{grabbers}}" wx:key="id" bindtap="showGrabberInfo" data-grabber="{{item}}">
-            <text>配送员：{{item.nickName}}   手机：{{item.mobile}} </text>
-          </swiper-item>
-        </swiper>
-      </view>
+      </swiper> 
     </view>
 
     <!-- 内容区域 -->
@@ -61,13 +47,14 @@
         <navigator class="item" url="/pages/goods/goods?id={{iitem.id}}" wx:for="{{goodsList}}" wx:key="id" wx:for-item="iitem" wx:for-index="iindex">
           <image class="img" src="{{iitem.picUrl}}" background-size="cover"></image>
           <view class="info">
-            <text class="name">{{iitem.name}}</text>
+            <text class="name">{{iitem.name}}</text> 
             <text class="desc">{{iitem.brief}}</text>
             <text wx:if="{{iitem.counterPrice != iitem.retailPrice}}" class="original-price">原价: ￥{{iitem.counterPrice}}</text>
             <text class="price">
               <text class="currency">现价: ￥</text>
               <text class="amount">{{iitem.retailPrice}}</text>
             </text>
+            <text wx:if="{{iitem.type==2}}" class="count">共{{iitem.ticketCount}}桶</text>
           </view>
         </navigator>
         <view class="loading-more" wx:if="{{isLoading && page < pages}}">加载中...</view>

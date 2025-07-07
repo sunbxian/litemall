@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.linlinjava.litemall.db.dao.GrabberMapper">
+    <!-- ...existing code... -->
+    <resultMap id="GrabberVoMap" type="org.linlinjava.litemall.db.domain.GrabberVo">
+        <result property="nickname" column="nickname"/>
+        <result property="avatar" column="avatar"/>
+        <collection property="addressList" ofType="org.linlinjava.litemall.db.domain.LitemallAddress">
+            <id property="id" column="address_id"/>
+            <result property="name" column="name"/>
+            <result property="province" column="province"/>
+            <result property="city" column="city"/>
+            <result property="county" column="county"/>
+            <result property="addressDetail" column="address_detail"/>
+            <result property="areaCode" column="area_code"/>
+            <result property="postalCode" column="postal_code"/>
+            <result property="tel" column="tel"/>
+            <result property="isDefault" column="is_default"/>
+            <result property="addTime" column="add_time"/>
+            <result property="updateTime" column="update_time"/>
+            <result property="deleted" column="deleted"/>
+            <result property="userId" column="user_id"/>
+        </collection>
+    </resultMap>
+
+    <select id="selectUserWithAddress" resultMap="GrabberVoMap">
+        SELECT
+            u.nickname,
+            u.avatar,
+            a.id as address_id,
+            a.name,
+            a.province,
+            a.city,
+            a.county,
+            a.address_detail,
+            a.area_code,
+            a.postal_code,
+            a.tel,
+            a.is_default,
+            a.add_time,
+            a.update_time,
+            a.deleted,
+            a.user_id
+        FROM litemall_user u
+        LEFT JOIN litemall_address a ON u.id = a.user_id AND a.deleted = 0
+        WHERE u.deleted = 0 and u.role = 'grabber'
+    </select>
+</mapper>

@@ -241,7 +241,7 @@ public class WxAuthController {
             user.setPassword(openId);
             user.setWeixinOpenid(openId);
             user.setAvatar("https://yanxuan.nosdn.127.net/80841d741d7fa3073e0ae27bf487339f.jpg?imageView&quality=90&thumbnail=64x64");
-            user.setNickname("微信用户");
+            user.setNickname("用户" + username);
             user.setGender((byte) 0);
             user.setUserLevel((byte) 0);
             user.setStatus((byte) 0);
