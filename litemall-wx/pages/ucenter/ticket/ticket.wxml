@@ -6,20 +6,17 @@
   </view>
 
   <view class="orders">
-    <navigator url="../orderDetail/orderDetail?id={{item.id}}" class="order" open-type="redirect" wx:for="{{orderList}}" wx:key="id"> 
-      <view class="goods" wx:for="{{item.goodsList}}" wx:key="id" wx:for-item="gitem">
+    <view class="order" wx:for="{{orderList}}" wx:key="id" wx:for-item="gitem"> 
+      <view class="goods"> 
         <view class="img">
           <image src="{{gitem.picUrl}}"></image>
         </view>
         <view class="info">
-          <text class="name">指定的商品： {{gitem.goodsName}}</text>
-          <text class="number">共：{{gitem.ticketCount}}桶， 还剩：{{item.ticketCount}}</text>
+          <text class="name">{{gitem.name}}</text>
+          <text class="number">共：{{gitem.ticketCount}}桶， 还剩：{{gitem.ticketCount - gitem.usedCount}}</text>
         </view>
         <view class="status"></view>
-      </view>
-      <view class="b">
-        <view class="l">实付：￥{{item.actualPrice}}</view>
-      </view>
-    </navigator>
+      </view> 
+    </view>
   </view>
 </view>

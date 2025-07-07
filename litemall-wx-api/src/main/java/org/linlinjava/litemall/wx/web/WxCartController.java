@@ -48,7 +48,7 @@ public class WxCartController {
     @Autowired
     private CouponVerifyService couponVerifyService;
     @Autowired
-    private LitemallOrderService orderService;
+    private LitemallTicketUserService ticketUserService;
 
     /**
      * 用户购物车信息
@@ -461,30 +461,29 @@ public class WxCartController {
             checkedGoodsList.add(cart);
         }
         BigDecimal checkedGoodsPrice = new BigDecimal(0.00);
-        Map<String, Object> orderData = new HashMap<>();
-        OrderVo orderVoSelect = null;
+        List<LitemallTicketUser> ticketUsers = null;
+        LitemallTicketUser ticketUserSelect = null;
 
         int goodsCount = 0;
         int ticketCount = 0;
         for (LitemallCart cart : checkedGoodsList) {
-            orderData = (Map)orderService.queryVoSelective2(userId, cart.getGoodsId(), null, 1, 10, "add_time", "desc");
-            List<OrderVo> list = (List<OrderVo>) orderData.get("list");
+            ticketUsers = ticketUserService.querySelective(userId, cart.getGoodsId(), 1, 10, "add_time", "desc");
 
             if (orderId == null || orderId.equals(-1) || orderId.equals(0)){
                 goodsCount = cart.getNumber();
             } else {
-                for (OrderVo orderVo : list) {
-                    if (Objects.equals(orderVo.getId(), orderId)) {
-                        orderVoSelect = orderVo;
-                        ticketCount = orderVo.getTicketCount();
+                for (LitemallTicketUser ticketUser : ticketUsers) {
+                    if (Objects.equals(ticketUser.getId(), orderId)) {
+                        ticketUserSelect = ticketUser;
+                        ticketCount = ticketUser.getTicketCount();
                         break;
                     }
                 }
-                if (orderVoSelect == null) {
+                if (ticketUserSelect == null) {
                     goodsCount = cart.getNumber();
                 } else {
-                    if (cart.getNumber() > orderVoSelect.getTicketCount()) {
-                        goodsCount = cart.getNumber() - orderVoSelect.getTicketCount();
+                    if (cart.getNumber() > ticketUserSelect.getTicketCount()) {
+                        goodsCount = cart.getNumber() - ticketUserSelect.getTicketCount();
                     }
                 }
             }
@@ -559,7 +558,10 @@ public class WxCartController {
 
         BigDecimal actualPrice = orderTotalPrice.subtract(integralPrice);
 
-        int size = ((List<?>) orderData.get("list")).size();
+        int size = 0;
+        if (ticketUsers != null && ticketUsers.size() > 0) {
+            size = ticketUsers.size();
+        }
 
         Map<String, Object> data = new HashMap<>();
         data.put("addressId", addressId);

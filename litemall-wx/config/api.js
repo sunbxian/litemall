@@ -84,6 +84,8 @@ module.exports = {
   OrderGoods: WxApiRoot + 'order/goods', // 代评价商品信息
   OrderComment: WxApiRoot + 'order/comment', // 评价订单商品信息
 
+  TicketList: WxApiRoot + 'ticket/list', //水票列表
+
   AftersaleSubmit: WxApiRoot + 'aftersale/submit', // 提交售后申请
   AftersaleList: WxApiRoot + 'aftersale/list', // 售后列表
   AftersaleDetail: WxApiRoot + 'aftersale/detail', // 售后详情

@@ -8,14 +8,14 @@
     <view class="unselect" bindtap='unselectOrder'>不选择电子水票</view>
   </view>
   <view class="orders">  
-    <view class="order" wx:for="{{orderList}}" wx:for-item="item" wx:key="id"  data-id="{{item.id}}" bindtap="selectOrder"> 
-      <view class="goods" wx:for="{{item.goodsList}}" wx:key="id" wx:for-item="gitem">
+    <view class="order" wx:for="{{orderList}}" wx:key="id" wx:for-item="gitem" data-id="{{gitem.id}}" bindtap="selectOrder">
+      <view class="goods"> 
         <view class="img">
           <image src="{{gitem.picUrl}}"></image>
         </view>
         <view class="info">
-          <text class="name">{{gitem.goodsName}}</text>
-          <text class="number">共：{{gitem.ticketCount}}桶， 还剩：{{item.ticketCount}}</text>
+          <text class="name">{{gitem.name}}</text>
+          <text class="number">共：{{gitem.ticketCount}}桶， 还剩：{{gitem.ticketCount - gitem.usedCount}}</text>
         </view>
         <view class="status"></view>
       </view> 

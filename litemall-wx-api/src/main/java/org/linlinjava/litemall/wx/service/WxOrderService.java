@@ -109,6 +109,8 @@ public class WxOrderService {
     private LitemallAftersaleService aftersaleService;
     @Autowired
     private LitemallGoodsService goodsService;
+    @Autowired
+    private LitemallTicketUserService ticketUserService;
 
     /**
      * 订单列表
@@ -444,9 +446,9 @@ public class WxOrderService {
             return ResponseUtil.badArgument();
         }
 
-        LitemallOrder payTicket = null;
+        LitemallTicketUser payTicket = null;
         if (payTicketId != null && payTicketId != 0 && payTicketId != -1) {
-            payTicket = orderService.findById(payTicketId);
+            payTicket = ticketUserService.findById(payTicketId);
         }
 
         // 团购优惠
@@ -471,9 +473,7 @@ public class WxOrderService {
         BigDecimal checkedGoodsPrice = new BigDecimal(0);
         int goodsCount = 0;
 
-        LitemallCart checkGoodsType0 = null;
         for (LitemallCart checkGoods : checkedGoodsList) {
-            checkGoodsType0 = checkGoods;
 
             if (payTicket != null) {
                 if (checkGoods.getNumber() > payTicket.getTicketCount()) {
@@ -537,8 +537,11 @@ public class WxOrderService {
         order.setIntegralPrice(integralPrice);
         order.setOrderPrice(orderTotalPrice);
         order.setActualPrice(actualPrice);
-        order.setType(checkGoodsType0.getType());
-        order.setTicketCount(checkGoodsType0.getTicketCount());
+        if (payTicket != null) {
+            order.setTicketCount(payTicket.getTicketCount());
+        } else {
+            order.setTicketCount(0);
+        }
 
         // 有团购
         if (grouponRules != null) {
@@ -573,13 +576,14 @@ public class WxOrderService {
             orderGoodsService.add(orderGoods);
 
             if (payTicket != null) {
-                int newTicketCount = 0;
+                int usedCount = 0;
                 if (cartGoods.getNumber() < payTicket.getTicketCount()) {
-                    newTicketCount = payTicket.getTicketCount() - cartGoods.getNumber();
+                    usedCount = cartGoods.getNumber();
+                } else {
+                    usedCount = payTicket.getTicketCount();
                 }
-                payTicket.setTicketCount(newTicketCount);
-
-                orderService.updateSelective(payTicket);
+                payTicket.setUsedCount(usedCount);
+                ticketUserService.updateSelective(payTicket);
             }
         }
 
@@ -954,6 +958,28 @@ public class WxOrderService {
             return WxPayNotifyResponse.fail("更新数据已失效");
         }
 
+        List<LitemallOrderGoods> orderGoodsList = orderGoodsService.queryByOid(order.getId());
+        for (LitemallOrderGoods orderGoods : orderGoodsList) {
+            // 如果订单的商品为2， 说明为水票，需要添加水票
+            if (orderGoods.getType() == 2) {
+                LitemallTicketUser ticketUser = new LitemallTicketUser();
+                ticketUser.setOrderId(order.getId());
+                ticketUser.setUserId(order.getUserId());
+                ticketUser.setDesignatedGoodId(orderGoods.getDesignatedId());
+                ticketUser.setName(orderGoods.getGoodsName());
+                ticketUser.setPicUrl(orderGoods.getPicUrl());
+                ticketUser.setTicketCount(orderGoods.getTicketCount());
+                ticketUser.setTicketGiftCount(orderGoods.getTicketGiftCount());
+                ticketUser.setStatus(1);
+
+                if (ticketUserService.add(ticketUser) == 0) {
+                    logger.error("添加水票数据失败");
+                    return WxPayNotifyResponse.fail("添加水票数据失败");
+                }
+
+            }
+        }
+
         //  支付成功，有团购信息，更新团购信息
         LitemallGroupon groupon = grouponService.queryByOrderId(order.getId());
         if (groupon != null) {
@@ -1265,53 +1291,24 @@ public class WxOrderService {
             return ResponseUtil.fail(ORDER_INVALID_OPERATION, "水票商品不存在");
         }
 
-        Integer orderId = null;
-        LitemallOrder order = null;
-        // 订单
-        order = new LitemallOrder();
-        order.setUserId(userId);
-        order.setOrderSn(orderService.generateOrderSn(userId));
-        order.setOrderStatus(OrderUtil.STATUS_CONFIRM);
-        order.setConsignee("水票赠送");
-        order.setMobile("");
-        order.setMessage("");
-        order.setAddress("");
-        order.setGoodsPrice(BigDecimal.valueOf(0));
-        order.setFreightPrice(BigDecimal.valueOf(0));
-        order.setCouponPrice(BigDecimal.valueOf(0));
-        order.setIntegralPrice(BigDecimal.valueOf(0));
-        order.setOrderPrice(BigDecimal.valueOf(0));
-        order.setActualPrice(BigDecimal.valueOf(0));
-        order.setType(2);
-        order.setTicketCount(cartGoods.getTicketCount());
-        order.setGrouponPrice(new BigDecimal(0));    //  团购价格
+        LitemallTicketUser ticketUser = new LitemallTicketUser();
 
-        // 添加订单表项
-        orderService.add(order);
-        orderId = order.getId();
+        LitemallGoods goods = goodsService.findById(goodId);
+        // 检测是否有水票商品
+        ticketUser.setUserId(userId);
+        ticketUser.setDesignatedGoodId(goodId);
+        ticketUser.setName("新用户赠送： " + goods.getName()+ "水票"   );
+        ticketUser.setPicUrl(goods.getPicUrl());
+        ticketUser.setTicketCount(10);
+        ticketUser.setTicketGiftCount(0);
+        ticketUser.setStatus(1);
 
-        String[] specifications = new String[0];
-        // 添加订单商品表项
-        LitemallOrderGoods orderGoods = new LitemallOrderGoods();
-        orderGoods.setOrderId(order.getId());
-        orderGoods.setGoodsId(cartGoods.getId());
-        orderGoods.setGoodsSn(cartGoods.getGoodsSn());
-        orderGoods.setGoodsName(cartGoods.getName());
-        orderGoods.setPicUrl(cartGoods.getPicUrl());
-        orderGoods.setPrice(cartGoods.getCounterPrice());
-        orderGoods.setNumber((short) 1);
-        orderGoods.setSpecifications(specifications);
-        orderGoods.setAddTime(LocalDateTime.now());
-        orderGoods.setDesignatedId(cartGoods.getDesignatedId());
-        orderGoods.setType(cartGoods.getType());
-        orderGoods.setTicketCount(cartGoods.getTicketCount());
-        orderGoods.setTicketGiftCount(cartGoods.getTicketGiftCount());
+        if (ticketUserService.add(ticketUser) == 0) {
+            logger.error("添加水票数据失败");
+            return ResponseUtil.fail();
+        }
 
-        orderGoodsService.add(orderGoods);
-
-        Map<String, Object> data = new HashMap<>();
-        data.put("orderId", orderId);
-        return ResponseUtil.ok(data);
+        return ResponseUtil.ok();
     }
 
 }
