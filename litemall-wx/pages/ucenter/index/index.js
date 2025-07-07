@@ -134,6 +134,17 @@ Page({
       });
     };
   },
+  goGabberOrder() {
+    if (this.data.hasLogin) {
+      wx.navigateTo({
+        url: "/pages/ucenter/gabberOrder/gabberOrder"
+      });
+    } else {
+      wx.navigateTo({
+        url: "/pages/auth/login/login"
+      });
+    };
+  },
   goGroupon() {
     if (this.data.hasLogin) {
       wx.navigateTo({

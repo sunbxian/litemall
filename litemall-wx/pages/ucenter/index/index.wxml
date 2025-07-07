@@ -109,9 +109,9 @@
       </view>
     </view>  
     <view class='user_column_row' wx:if="{{userInfo.role === 'grabber'}}">
-      <view class='user_column_item' bindtap='aboutUs'>
+      <view class='user_column_item' bindtap='goGabberOrder'>
         <image class='user_column_item_image' src='/static/images/mobile.png'></image>
-        <view class='user_column_item_text'>代办</view>
+        <view class='user_column_item_text'>待办</view>
       </view>
     </view>
   </view>

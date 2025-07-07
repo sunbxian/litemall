@@ -75,6 +75,7 @@ module.exports = {
   OrderPrepay: WxApiRoot + 'order/prepay', // 订单的预支付会话
   OrderList: WxApiRoot + 'order/list', //订单列表
   OrderListType: WxApiRoot + 'order/listType', //订单列表
+  OrderlistGrab: WxApiRoot + 'order/listGrab', //配送员配送订单列表
   OrderDetail: WxApiRoot + 'order/detail', //订单详情
   OrderCancel: WxApiRoot + 'order/cancel', //取消订单
   OrderRefund: WxApiRoot + 'order/refund', //退款取消订单

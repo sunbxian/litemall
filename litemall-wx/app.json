@@ -45,7 +45,9 @@
     "pages/ucenter/userInfo/userInfo",
     "pages/ucenter/ticket/ticket",
     "pages/ucenter/deposit/deposit",
-    "pages/ucenter/ticketSelect/ticketSelect"
+    "pages/ucenter/ticketSelect/ticketSelect",
+    "pages/ucenter/gabberOrder/gabberOrder",
+    "pages/ucenter/gabberOrderDetail/gabberOrderDetail"
   ],
   "window": {
     "navigationBarBackgroundColor": "#FFFFFF",
