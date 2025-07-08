@@ -202,7 +202,6 @@ public class WxOrderService {
             orderVo.put("orderStatusText", OrderUtil.orderStatusText(o));
             orderVo.put("handleOption", OrderUtil.build(o));
             orderVo.put("aftersaleStatus", o.getAftersaleStatus());
-            orderVo.put("type", o.getType());
             orderVo.put("ticketCount", o.getTicketCount());
             LitemallGroupon groupon = grouponService.queryByOrderId(o.getId());
             if (groupon != null) {
@@ -267,7 +266,6 @@ public class WxOrderService {
             orderVo.put("orderStatusText", OrderUtil.orderStatusText(o));
             orderVo.put("handleOption", OrderUtil.build(o));
             orderVo.put("aftersaleStatus", o.getAftersaleStatus());
-            orderVo.put("type", o.getType());
             orderVo.put("ticketCount", o.getTicketCount());
             LitemallGroupon groupon = grouponService.queryByOrderId(o.getId());
             if (groupon != null) {
@@ -471,21 +469,24 @@ public class WxOrderService {
         }
         BigDecimal checkedGoodsPrice = new BigDecimal(0);
 
-        int ticketCount = 0;
+        int ticketSheCount = 0;
         if (payTicket != null) {
-            ticketCount = payTicket.getTicketCount();
+            ticketSheCount = payTicket.getTicketCount() - payTicket.getUsedCount();
         }
 
+        int ticketCount = 0;
         for (LitemallCart checkGoods : checkedGoodsList) {
             int goodsCount;
-            if (ticketCount > 0) {
+            if (ticketSheCount > 0) {
                 if (Objects.equals(checkGoods.getGoodsId(), payTicket.getDesignatedGoodId())) {
-                    if (checkGoods.getNumber() > ticketCount) {
-                        goodsCount = checkGoods.getNumber() - payTicket.getTicketCount();
-                        ticketCount = 0;
+                    if (checkGoods.getNumber() > ticketSheCount) {
+                        goodsCount = checkGoods.getNumber() - ticketSheCount;
+                        ticketCount = ticketCount + ticketSheCount;
+                        ticketSheCount = 0;
                     } else {
-                        goodsCount = payTicket.getTicketCount() - checkGoods.getNumber();
-                        ticketCount = goodsCount;
+                        goodsCount = 0;
+                        ticketCount = ticketCount + checkGoods.getNumber();
+                        ticketSheCount = ticketSheCount - checkGoods.getNumber();
                     }
                 } else {
                     goodsCount = checkGoods.getNumber();
@@ -501,8 +502,6 @@ public class WxOrderService {
                 checkedGoodsPrice = checkedGoodsPrice.add(checkGoods.getPrice().multiply(new BigDecimal(goodsCount)));
             }
         }
-
-
 
         // 获取可用的优惠券信息
         // 使用优惠券减免的金额
@@ -591,7 +590,7 @@ public class WxOrderService {
 
         if (payTicket != null) {
             // 更新水票数量
-            payTicket.setUsedCount(ticketCount);
+            payTicket.setUsedCount(ticketCount + payTicket.getUsedCount());
             ticketUserService.updateSelective(payTicket);
 
             LitemallTicketUserUse ticketUserUse = new LitemallTicketUserUse();

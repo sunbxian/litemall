@@ -99,9 +99,6 @@ public class LitemallOrderService {
         if (orderStatus != null) {
             criteria.andOrderStatusIn(orderStatus);
         }
-        if (type != null) {
-            criteria.andTypeEqualTo(type);
-        }
         criteria.andDeletedEqualTo(false);
         if (!StringUtils.isEmpty(sort) && !StringUtils.isEmpty(order)) {
             example.setOrderByClause(sort + " " + order);
@@ -118,9 +115,6 @@ public class LitemallOrderService {
         criteria.andGrabUserIdEqualTo(userId);
         if (orderStatus != null) {
             criteria.andOrderStatusIn(orderStatus);
-        }
-        if (type != null) {
-            criteria.andTypeEqualTo(type);
         }
         criteria.andDeletedEqualTo(false);
         if (!StringUtils.isEmpty(sort) && !StringUtils.isEmpty(order)) {
