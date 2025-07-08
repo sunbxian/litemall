@@ -47,7 +47,20 @@ public class LitemallTicketUserService {
         return ticketUserMapper.insertSelective(ticketUser);
     }
 
-    public int updateSelective(LitemallTicketUser order) {
+    public int updateByPrimaryKeySelective(LitemallTicketUser order) {
         return ticketUserMapper.updateByPrimaryKeySelective(order);
     }
+
+    public int updateSelective(Integer orderId) {
+        LitemallTicketUserExample example = new LitemallTicketUserExample();
+        LitemallTicketUserExample.Criteria criteria = example.createCriteria();
+
+        criteria.andOrderIdEqualTo(orderId);  // WHERE条件
+
+        LitemallTicketUser ticketUser = new LitemallTicketUser();
+        ticketUser.setDeleted(true);
+
+        return ticketUserMapper.updateByExampleSelective(ticketUser, example);
+    }
+
 }

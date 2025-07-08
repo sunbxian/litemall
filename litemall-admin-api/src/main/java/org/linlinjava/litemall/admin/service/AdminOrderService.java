@@ -54,6 +54,12 @@ public class AdminOrderService {
     private LogHelper logHelper;
     @Autowired
     private LitemallCouponUserService couponUserService;
+    @Autowired
+    private LitemallTicketUserService ticketUserService;
+    @Autowired
+    private LitemallTicketUserUseService ticketUserUseService;
+    @Autowired
+    private LitemallBottleUserService bottleUserService;
 
     public Object list(String nickname, String consignee, String orderSn, LocalDateTime start, LocalDateTime end, List<Short> orderStatusArray,
                        Integer page, Integer limit, String sort, String order) {
@@ -160,6 +166,14 @@ public class AdminOrderService {
             if (productService.addStock(productId, number) == 0) {
                 throw new RuntimeException("商品货品库存增加失败");
             }
+
+            if (orderGoods.getType() == 1) {
+                // 如果是退订押桶， 要将用户的押桶数量减少
+                bottleUserService.updateSelective(order.getId());
+            } else if (orderGoods.getType() == 2) {
+                // 如果是退订水票， 就是用户相关水票移除
+                ticketUserService.updateSelective(order.getId());
+            }
         }
 
         // 返还优惠券
@@ -169,6 +183,29 @@ public class AdminOrderService {
             couponUser.setStatus(CouponUserConstant.STATUS_USABLE);
             couponUser.setUpdateTime(LocalDateTime.now());
             couponUserService.update(couponUser);
+        }
+
+        List<LitemallTicketUserUse> ticketUserUses = ticketUserUseService.findByOid(orderId);
+
+        // 返还水票数量
+        int ticketCount = 0;
+        for (LitemallTicketUserUse ticketUserUse: ticketUserUses) {
+            // 水票状态设置为不生效
+            ticketUserUse.setStatus(0);
+            ticketUserUse.setUpdateTime(LocalDateTime.now());
+            ticketCount = ticketCount + ticketUserUse.getUsedCount();
+
+            ticketUserUseService.updateSelective(ticketUserUse);
+        }
+
+        if (ticketCount > 0) {
+            // 更新水票数量
+            // 根据水票使用记录获取水票信息, 有且只有一个水票使用记录
+            LitemallTicketUser ticketUser = ticketUserService.findById(ticketUserUses.get(0).getTuId());
+            if (ticketUser != null) {
+                ticketUser.setUsedCount(ticketUser.getUsedCount() - ticketCount);
+                ticketUserService.updateByPrimaryKeySelective(ticketUser);
+            }
         }
 
         //TODO 发送邮件和短信通知，这里采用异步发送

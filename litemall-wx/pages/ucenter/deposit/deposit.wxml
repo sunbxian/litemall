@@ -13,7 +13,7 @@
         </view>
         <view class="info">
           <text class="name">{{gitem.name}}</text>
-          <text class="number">共押：{{gitem.count}}桶</text>
+          <text class="number">共押：{{gitem.count}} 个桶</text>
         </view>
         <view class="status"></view>
       </view> 

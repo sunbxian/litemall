@@ -2,11 +2,8 @@ package org.linlinjava.litemall.db.service;
 
 import com.github.pagehelper.PageHelper;
 import org.linlinjava.litemall.db.dao.LitemallBottleUserMapper;
-import org.linlinjava.litemall.db.dao.LitemallTicketUserMapper;
 import org.linlinjava.litemall.db.domain.LitemallBottleUser;
 import org.linlinjava.litemall.db.domain.LitemallBottleUserExample;
-import org.linlinjava.litemall.db.domain.LitemallTicketUser;
-import org.linlinjava.litemall.db.domain.LitemallTicketUserExample;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -44,7 +41,15 @@ public class LitemallBottleUserService {
         return bottleUserMapper.insertSelective(ticketUser);
     }
 
-    public int updateSelective(LitemallBottleUser order) {
-        return bottleUserMapper.updateByPrimaryKeySelective(order);
+    public int updateSelective(Integer orderId) {
+        LitemallBottleUserExample example = new LitemallBottleUserExample();
+        LitemallBottleUserExample.Criteria criteria = example.createCriteria();
+
+        criteria.andOrderIdEqualTo(orderId);  // WHERE条件
+
+        LitemallBottleUser bottleUser = new LitemallBottleUser();
+        bottleUser.setDeleted(true);
+
+        return bottleUserMapper.updateByExampleSelective(bottleUser, example);
     }
 }

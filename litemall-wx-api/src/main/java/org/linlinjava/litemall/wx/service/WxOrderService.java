@@ -593,7 +593,7 @@ public class WxOrderService {
         if (payTicket != null) {
             // 更新水票数量
             payTicket.setUsedCount(ticketCount + payTicket.getUsedCount());
-            ticketUserService.updateSelective(payTicket);
+            ticketUserService.updateByPrimaryKeySelective(payTicket);
 
             LitemallTicketUserUse ticketUserUse = new LitemallTicketUserUse();
             ticketUserUse.setOrderId(orderId);
@@ -1329,7 +1329,7 @@ public class WxOrderService {
             LitemallTicketUser ticketUser = ticketUserService.findById(ticketUserUses.get(0).getTuId());
             if (ticketUser != null) {
                 ticketUser.setUsedCount(ticketUser.getUsedCount() - ticketCount);
-                ticketUserService.updateSelective(ticketUser);
+                ticketUserService.updateByPrimaryKeySelective(ticketUser);
             }
         }
     }
