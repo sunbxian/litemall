@@ -13,7 +13,7 @@
         </view>
         <view class="info">
           <text class="name">{{gitem.name}}</text>
-          <text class="number">共：{{gitem.ticketCount}}桶， 还剩：{{gitem.ticketCount - gitem.usedCount}}</text>
+          <text class="number">共：{{gitem.ticketCount}}桶， 还剩：{{gitem.ticketCount - gitem.usedCount}}桶</text>
         </view>
         <view class="status"></view>
       </view> 

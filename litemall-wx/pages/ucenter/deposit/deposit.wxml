@@ -1,29 +1,22 @@
-<view class="container">
+<view class="container"> 
   <view class="no-order" wx:if="{{orderList.length <= 0}}">
     <view class="c">
-      <text>还没有任何押桶呢</text>
+      <text>还没有压桶呢</text>
     </view>
   </view>
 
   <view class="orders">
-    <navigator url="../orderDetail/orderDetail?id={{item.id}}" class="order" open-type="redirect" wx:for="{{orderList}}" wx:key="id">
-      <view class="h">
-        <view class="l">订单编号：{{item.orderSn}}</view>
-        <view class="r">{{item.orderStatusText}}</view>
-      </view>
-      <view class="goods" wx:for="{{item.goodsList}}" wx:key="id" wx:for-item="gitem">
+    <view class="order" wx:for="{{orderList}}" wx:key="id" wx:for-item="gitem"> 
+      <view class="goods"> 
         <view class="img">
           <image src="{{gitem.picUrl}}"></image>
         </view>
         <view class="info">
-          <text class="name">{{gitem.goodsName}}</text>
-          <text class="number">共{{gitem.number}}件商品</text>
+          <text class="name">{{gitem.name}}</text>
+          <text class="number">共押：{{gitem.count}}桶</text>
         </view>
         <view class="status"></view>
-      </view>
-      <view class="b">
-        <view class="l">实付：￥{{item.actualPrice}}</view>
-      </view>
-    </navigator>
+      </view> 
+    </view>
   </view>
 </view>

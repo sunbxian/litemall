@@ -110,6 +110,8 @@ public class WxOrderService {
     private LitemallTicketUserService ticketUserService;
     @Autowired
     private LitemallTicketUserUseService ticketUserUseService;
+    @Autowired
+    private LitemallBottleUserService bottleUserService;
 
     /**
      * 订单列表
@@ -995,6 +997,18 @@ public class WxOrderService {
                     return WxPayNotifyResponse.fail("添加水票数据失败");
                 }
 
+            } else if (orderGoods.getType() == 1) {
+                LitemallBottleUser bottleUser = new LitemallBottleUser();
+                bottleUser.setOrderId(order.getId());
+                bottleUser.setUserId(order.getUserId());
+                bottleUser.setName(orderGoods.getGoodsName());
+                bottleUser.setPicUrl(orderGoods.getPicUrl());
+                bottleUser.setCount(Integer.valueOf(orderGoods.getNumber()));
+
+                if (bottleUserService.add(bottleUser) == 0) {
+                    logger.error("添加押桶数据失败");
+                    return WxPayNotifyResponse.fail("添加押桶数据失败");
+                }
             }
         }
 

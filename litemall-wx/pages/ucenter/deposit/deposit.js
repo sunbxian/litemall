@@ -23,9 +23,7 @@ Page({
   },
   getOrderList() {
     let that = this;
-    util.request(api.OrderListType, {
-      type: 1,
-      showType: that.data.showType,
+    util.request(api.BottleList, {  
       page: that.data.page,
       limit: that.data.limit
     }).then(function(res) {

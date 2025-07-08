@@ -87,6 +87,8 @@ module.exports = {
 
   TicketList: WxApiRoot + 'ticket/list', //水票列表
 
+  BottleList: WxApiRoot + 'bottle/list', //押桶订单列表
+
   AftersaleSubmit: WxApiRoot + 'aftersale/submit', // 提交售后申请
   AftersaleList: WxApiRoot + 'aftersale/list', // 售后列表
   AftersaleDetail: WxApiRoot + 'aftersale/detail', // 售后详情
