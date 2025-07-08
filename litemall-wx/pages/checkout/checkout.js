@@ -36,7 +36,7 @@ Page({
       cartId: that.data.cartId,
       addressId: that.data.addressId,
       couponId: that.data.couponId,
-      orderId: that.data.orderId,
+      payTicketId: that.data.orderId,
       userCouponId: that.data.userCouponId,
       grouponRulesId: that.data.grouponRulesId
     }).then(function(res) {

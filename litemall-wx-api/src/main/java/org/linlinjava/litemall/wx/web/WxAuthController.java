@@ -8,6 +8,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.linlinjava.litemall.core.notify.NotifyService;
 import org.linlinjava.litemall.core.notify.NotifyType;
+import org.linlinjava.litemall.core.system.SystemConfig;
 import org.linlinjava.litemall.core.util.*;
 import org.linlinjava.litemall.core.util.bcrypt.BCryptPasswordEncoder;
 import org.linlinjava.litemall.db.domain.LitemallUser;
@@ -164,7 +165,8 @@ public class WxAuthController {
 
             // 新用户发送注册优惠券
             couponAssignService.assignForRegister(user.getId());
-            wxOrderService.giftTicket(user.getId());
+            // 赠送新用户水票
+            wxOrderService.giftTicket(user.getId(), SystemConfig.getGiftNewUserCount(), SystemConfig.LITEMALL_GIFT_NEW_USER_COUNT);
 
             userInfo.setUserName(username);
             userInfo.setRole(user.getRole());
@@ -254,7 +256,8 @@ public class WxAuthController {
 
             // 新用户发送注册优惠券
             couponAssignService.assignForRegister(user.getId());
-            wxOrderService.giftTicket(user.getId());
+            // 赠送新用户水票
+            wxOrderService.giftTicket(user.getId(), SystemConfig.getGiftNewUserCount(), SystemConfig.LITEMALL_GIFT_NEW_USER_COUNT);
 
             userInfo.setUserName(user.getUsername());
             userInfo.setNickName(user.getNickname());
@@ -420,7 +423,8 @@ public class WxAuthController {
 
         // 给新用户发送注册优惠券
         couponAssignService.assignForRegister(user.getId());
-        wxOrderService.giftTicket(user.getId());
+        // 赠送新用户水票
+        wxOrderService.giftTicket(user.getId(), SystemConfig.getGiftNewUserCount(), SystemConfig.LITEMALL_GIFT_NEW_USER_COUNT);
 
         // userInfo
         UserInfo userInfo = new UserInfo();
@@ -655,15 +659,20 @@ public class WxAuthController {
 
         LitemallUser user = userService.findById(userId);
 
-
         if (!StringUtils.isEmpty(referrerUsername)) {
-            List<LitemallUser> userList =  userService.queryByUsername(referrerUsername);
+            List<LitemallUser> userList = userService.queryByUsername(referrerUsername);
             if (!userList.isEmpty()) {
-                Integer referrerIdId = userList.get(0).getId();
+                LitemallUser litemallUser = userList.get(0);
+                Integer referrerIdId = litemallUser.getId();
+                Integer referrerReferrerId = litemallUser.getReferrerId();
                 if (Objects.equals(referrerIdId, userId)) {
                     return ResponseUtil.fail(409, "不能设置自己为推荐人");
                 } else if (user.getReferrerId() != null) {
                     return ResponseUtil.fail(409, "已经设置过推荐人，不能重复设置");
+                } else if (Objects.equals(referrerIdId, referrerReferrerId)) {
+                    return ResponseUtil.fail(409, "不能设置自己的推荐人为推荐人");
+                } else if (user.getAddTime().isBefore(litemallUser.getAddTime())) {
+                    return ResponseUtil.fail(409, "不能设置比自己注册时间晚的用户为推荐人");
                 } else {
                     user.setReferrerId(referrerIdId);
                 }
@@ -673,6 +682,8 @@ public class WxAuthController {
             if (userService.updateById(user) == 0) {
                 return ResponseUtil.updatedDataFailed();
             }
+            // 赠送推荐人水票
+            wxOrderService.giftTicket(user.getId(), SystemConfig.getGiftReferrerCount(), SystemConfig.LITEMALL_GIFT_REFERER_COUNT);
         } else {
             return ResponseUtil.badArgument();
         }

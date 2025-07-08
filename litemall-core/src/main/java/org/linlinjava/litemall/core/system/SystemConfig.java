@@ -32,6 +32,8 @@ public class SystemConfig {
     public final static String LITEMALL_MALL_Latitude = "litemall_mall_latitude";
     // 商场赠送配置
     public final static String LITEMALL_GIFT_TICKET = "litemall_gift_ticket";
+    public final static String LITEMALL_GIFT_REFERER_COUNT = "litemall_gift_referrer_count";
+    public final static String LITEMALL_GIFT_NEW_USER_COUNT = "litemall_gift_new_user_count";
 
     //所有的配置均保存在该 HashMap 中
     private static Map<String, String> SYSTEM_CONFIGS = new HashMap<>();
@@ -126,6 +128,14 @@ public class SystemConfig {
 
     public static Integer getGiftTicket() {
         return getConfigInt(LITEMALL_GIFT_TICKET);
+    }
+
+    public static Integer getGiftReferrerCount() {
+        return getConfigInt(LITEMALL_GIFT_REFERER_COUNT);
+    }
+
+    public static Integer getGiftNewUserCount() {
+        return getConfigInt(LITEMALL_GIFT_NEW_USER_COUNT);
     }
 
 

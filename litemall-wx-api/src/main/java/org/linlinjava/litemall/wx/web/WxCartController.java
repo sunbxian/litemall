@@ -418,7 +418,7 @@ public class WxCartController {
      * @return 购物车操作结果
      */
     @GetMapping("checkout")
-    public Object checkout(@LoginUser Integer userId, Integer cartId, Integer addressId, Integer couponId, Integer orderId, Integer userCouponId, Integer grouponRulesId) {
+    public Object checkout(@LoginUser Integer userId, Integer cartId, Integer addressId, Integer couponId, Integer payTicketId, Integer userCouponId, Integer grouponRulesId) {
         if (userId == null) {
             return ResponseUtil.unlogin();
         }
@@ -461,31 +461,43 @@ public class WxCartController {
             checkedGoodsList.add(cart);
         }
         BigDecimal checkedGoodsPrice = new BigDecimal(0.00);
-        List<LitemallTicketUser> ticketUsers = null;
-        LitemallTicketUser ticketUserSelect = null;
+        List<LitemallTicketUser> ticketUsers = ticketUserService.querySelective(userId, 0, 1, 10, "add_time", "desc");
 
-        int goodsCount = 0;
+        LitemallTicketUser payTicket = null;
+        if (payTicketId != null && payTicketId != 0 && payTicketId != -1) {
+//            payTicket = ticketUserService.findById(payTicketId);
+            for (LitemallTicketUser ticketUser : ticketUsers) {
+                if (ticketUser.getId().equals(payTicketId)) {
+                    payTicket = ticketUser;
+                    break;
+                }
+            }
+        }
+
+        int ticketSheCount = 0;
+        if (payTicket != null) {
+            ticketSheCount = payTicket.getTicketCount() - payTicket.getUsedCount();
+        }
+
         int ticketCount = 0;
         for (LitemallCart cart : checkedGoodsList) {
-            ticketUsers = ticketUserService.querySelective(userId, cart.getGoodsId(), 1, 10, "add_time", "desc");
-
-            if (orderId == null || orderId.equals(-1) || orderId.equals(0)){
-                goodsCount = cart.getNumber();
-            } else {
-                for (LitemallTicketUser ticketUser : ticketUsers) {
-                    if (Objects.equals(ticketUser.getId(), orderId)) {
-                        ticketUserSelect = ticketUser;
-                        ticketCount = ticketUser.getTicketCount();
-                        break;
+            int goodsCount;
+            if (ticketSheCount > 0) {
+                if (Objects.equals(cart.getGoodsId(), payTicket.getDesignatedGoodId())) {
+                    if (cart.getNumber() > ticketSheCount) {
+                        goodsCount = cart.getNumber() - ticketSheCount;
+                        ticketCount = ticketCount + ticketSheCount;
+                        ticketSheCount = 0;
+                    } else {
+                        goodsCount = 0;
+                        ticketCount = ticketCount + cart.getNumber();
+                        ticketSheCount = ticketSheCount - cart.getNumber();
                     }
-                }
-                if (ticketUserSelect == null) {
-                    goodsCount = cart.getNumber();
                 } else {
-                    if (cart.getNumber() > ticketUserSelect.getTicketCount()) {
-                        goodsCount = cart.getNumber() - ticketUserSelect.getTicketCount();
-                    }
+                    goodsCount = cart.getNumber();
                 }
+            } else {
+                goodsCount = cart.getNumber();
             }
 
             //  只有当团购规格商品ID符合才进行团购优惠
@@ -563,10 +575,15 @@ public class WxCartController {
             size = ticketUsers.size();
         }
 
+        int useTicketCount = 0;
+        if (payTicket != null) {
+            useTicketCount = payTicket.getTicketCount() - payTicket.getUsedCount();
+        }
+
         Map<String, Object> data = new HashMap<>();
         data.put("addressId", addressId);
         data.put("couponId", couponId);
-        data.put("orderId", orderId);
+        data.put("orderId", payTicketId);
         data.put("userCouponId", userCouponId);
         data.put("cartId", cartId);
         data.put("grouponRulesId", grouponRulesId);
@@ -580,7 +597,7 @@ public class WxCartController {
         data.put("actualPrice", actualPrice);
         data.put("checkedGoodsList", checkedGoodsList);
         data.put("orderTicketCount", size);
-        data.put("ticketCount", ticketCount);
+        data.put("ticketCount", useTicketCount);
         return ResponseUtil.ok(data);
     }
 }

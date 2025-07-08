@@ -303,7 +303,7 @@ Page({
 
     let that = this;
     wx.showLoading({ title: '保存中...' });  
-    util.request(api.AuthProfile, submitData , 'POST').then(function(res) {
+    util.request(api.AuthReferrer, submitData , 'POST').then(function(res) {
       wx.hideLoading();
       if (res.errno === 0) {  
         wx.showToast({

@@ -1327,7 +1327,7 @@ public class WxOrderService {
      * @return 提交订单操作结果
      */
     @Transactional
-    public Object giftTicket(Integer userId) {
+    public Object giftTicket(Integer userId, Integer giftTicketCount, String giteType) {
         if (userId == null) {
             return ResponseUtil.unlogin();
         }
@@ -1348,9 +1348,17 @@ public class WxOrderService {
         // 检测是否有水票商品
         ticketUser.setUserId(userId);
         ticketUser.setDesignatedGoodId(goodId);
-        ticketUser.setName("新用户赠送： " + goods.getName()+ "水票"   );
+        if (giteType.equals(SystemConfig.LITEMALL_GIFT_NEW_USER_COUNT)) {
+            // 赠送水票
+            ticketUser.setName("新用户赠送： " + goods.getName() + "水票");
+        } else if (giteType.equals(SystemConfig.LITEMALL_GIFT_REFERER_COUNT)) {
+            // 充值水票
+            ticketUser.setName("推荐赠送： " + goods.getName() + "水票");
+        } else {
+            return ResponseUtil.fail(ORDER_INVALID_OPERATION, "水票赠送类型错误");
+        }
         ticketUser.setPicUrl(goods.getPicUrl());
-        ticketUser.setTicketCount(10);
+        ticketUser.setTicketCount(giftTicketCount);
         ticketUser.setTicketGiftCount(0);
         ticketUser.setStatus(1);
 

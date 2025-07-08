@@ -26,6 +26,7 @@ module.exports = {
   AuthBindPhone: WxApiRoot + 'auth/bindPhone', //绑定微信手机号
   AuthInfo: WxApiRoot + 'auth/info', //用户信息
   AuthProfile: WxApiRoot + 'auth/profile', //账号修改
+  AuthReferrer: WxApiRoot + 'auth/referrer', //设置推荐人
  
   GoodsCount: WxApiRoot + 'goods/count', //统计商品总数
   GoodsList: WxApiRoot + 'goods/list', //获得商品列表

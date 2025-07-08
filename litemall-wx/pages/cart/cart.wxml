@@ -7,9 +7,9 @@
   </view>
   <view class='login' wx:else>
     <view class="service-policy">
-      <view class="item">30天无忧退货</view>
-      <view class="item">48小时快速退款</view>
-      <view class="item">满88元免邮费</view>
+      <view class="item">押桶无忧退款</view>
+      <view class="item">2小时内快速送达</view>
+      <view class="item">新用户赠送水票</view>
     </view>
     <view class="no-cart" wx:if="{{cartGoods.length <= 0}}">
       <view class="c">

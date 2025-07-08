@@ -107,26 +107,25 @@ page {
 }
 
 .order .goods .info {
-  height: 145.83rpx;
   flex: 1;
+  display: flex;
+  flex-direction: column; 
   padding-left: 20rpx;
 }
 
-.order .goods .name {
-  margin-top: 30rpx;
-  display: block;
-  height: 44rpx;
-  line-height: 44rpx;
-  color: #333;
-  font-size: 30rpx;
+.order .goods .info .name {
+  margin-top: 25rpx; 
+  /* height: 44rpx; */
+  /* line-height: 44rpx; */
+  color: #000; /* 黑色 */
+  font-size: 32rpx;
 }
 
-.order .goods .number {
-  display: block;
-  height: 37rpx;
-  line-height: 37rpx;
+.order .goods .info .number { 
+  /* height: 37rpx; */
+  /* line-height: 37rpx; */
   color: #666;
-  font-size: 25rpx;
+  font-size: 28rpx;
 }
 
 .order .goods .status {
