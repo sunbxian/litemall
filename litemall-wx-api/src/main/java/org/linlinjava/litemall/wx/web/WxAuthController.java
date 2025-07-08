@@ -640,6 +640,47 @@ public class WxAuthController {
     }
 
     /**
+     * 设置推荐人
+     * @param userId
+     * @param body
+     * @param request
+     * @return
+     */
+    @PostMapping("referrer")
+    public Object referrer(@LoginUser Integer userId, @RequestBody String body, HttpServletRequest request) {
+        if (userId == null) {
+            return ResponseUtil.unlogin();
+        }
+        String referrerUsername = JacksonUtil.parseString(body, "referrer_username");
+
+        LitemallUser user = userService.findById(userId);
+
+
+        if (!StringUtils.isEmpty(referrerUsername)) {
+            List<LitemallUser> userList =  userService.queryByUsername(referrerUsername);
+            if (!userList.isEmpty()) {
+                Integer referrerIdId = userList.get(0).getId();
+                if (Objects.equals(referrerIdId, userId)) {
+                    return ResponseUtil.fail(409, "不能设置自己为推荐人");
+                } else if (user.getReferrerId() != null) {
+                    return ResponseUtil.fail(409, "已经设置过推荐人，不能重复设置");
+                } else {
+                    user.setReferrerId(referrerIdId);
+                }
+            } else {
+                return ResponseUtil.fail(409, "没有找到该 " +referrerUsername+ " 用户");
+            }
+            if (userService.updateById(user) == 0) {
+                return ResponseUtil.updatedDataFailed();
+            }
+        } else {
+            return ResponseUtil.badArgument();
+        }
+
+        return ResponseUtil.ok();
+    }
+
+    /**
      * 微信手机号码绑定
      *
      * @param userId

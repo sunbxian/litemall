@@ -40,10 +40,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.linlinjava.litemall.wx.util.WxResponseCode.*;
 
@@ -111,6 +108,8 @@ public class WxOrderService {
     private LitemallGoodsService goodsService;
     @Autowired
     private LitemallTicketUserService ticketUserService;
+    @Autowired
+    private LitemallTicketUserUseService ticketUserUseService;
 
     /**
      * 订单列表
@@ -471,17 +470,30 @@ public class WxOrderService {
             return ResponseUtil.badArgumentValue();
         }
         BigDecimal checkedGoodsPrice = new BigDecimal(0);
-        int goodsCount = 0;
+
+        int ticketCount = 0;
+        if (payTicket != null) {
+            ticketCount = payTicket.getTicketCount();
+        }
 
         for (LitemallCart checkGoods : checkedGoodsList) {
-
-            if (payTicket != null) {
-                if (checkGoods.getNumber() > payTicket.getTicketCount()) {
-                    goodsCount = checkGoods.getNumber() - payTicket.getTicketCount();
+            int goodsCount;
+            if (ticketCount > 0) {
+                if (Objects.equals(checkGoods.getGoodsId(), payTicket.getDesignatedGoodId())) {
+                    if (checkGoods.getNumber() > ticketCount) {
+                        goodsCount = checkGoods.getNumber() - payTicket.getTicketCount();
+                        ticketCount = 0;
+                    } else {
+                        goodsCount = payTicket.getTicketCount() - checkGoods.getNumber();
+                        ticketCount = goodsCount;
+                    }
+                } else {
+                    goodsCount = checkGoods.getNumber();
                 }
             } else {
                 goodsCount = checkGoods.getNumber();
             }
+
             //  只有当团购规格商品ID符合才进行团购优惠
             if (grouponRules != null && grouponRules.getGoodsId().equals(checkGoods.getGoodsId())) {
                 checkedGoodsPrice = checkedGoodsPrice.add(checkGoods.getPrice().subtract(grouponPrice).multiply(new BigDecimal(goodsCount)));
@@ -538,7 +550,7 @@ public class WxOrderService {
         order.setOrderPrice(orderTotalPrice);
         order.setActualPrice(actualPrice);
         if (payTicket != null) {
-            order.setTicketCount(payTicket.getTicketCount());
+            order.setTicketCount(ticketCount);
         } else {
             order.setTicketCount(0);
         }
@@ -575,16 +587,20 @@ public class WxOrderService {
 
             orderGoodsService.add(orderGoods);
 
-            if (payTicket != null) {
-                int usedCount = 0;
-                if (cartGoods.getNumber() < payTicket.getTicketCount()) {
-                    usedCount = cartGoods.getNumber();
-                } else {
-                    usedCount = payTicket.getTicketCount();
-                }
-                payTicket.setUsedCount(usedCount);
-                ticketUserService.updateSelective(payTicket);
-            }
+        }
+
+        if (payTicket != null) {
+            // 更新水票数量
+            payTicket.setUsedCount(ticketCount);
+            ticketUserService.updateSelective(payTicket);
+
+            LitemallTicketUserUse ticketUserUse = new LitemallTicketUserUse();
+            ticketUserUse.setOrderId(orderId);
+            ticketUserUse.setTuId(payTicket.getId());
+            ticketUserUse.setUsedCount(ticketCount);
+            ticketUserUse.setStatus(1);
+
+            ticketUserUseService.add(ticketUserUse);
         }
 
         // 删除购物车里面的商品信息
@@ -762,6 +778,9 @@ public class WxOrderService {
 
         // 返还优惠券
         releaseCoupon(orderId);
+
+        // 返还水票
+        releaseTicket(orderId);
 
         return ResponseUtil.ok();
     }
@@ -1266,6 +1285,39 @@ public class WxOrderService {
             couponUser.setStatus(CouponUserConstant.STATUS_USABLE);
             couponUser.setUpdateTime(LocalDateTime.now());
             couponUserService.update(couponUser);
+        }
+    }
+
+    /**
+     * 取消订单/退款返还水票
+     * <br/>
+     * @param orderId
+     * @return void
+     * @author Tyson
+     * @date 2020/6/8/0008 1:41
+     */
+    public void releaseTicket(Integer orderId) {
+        List<LitemallTicketUserUse> ticketUserUses = ticketUserUseService.findByOid(orderId);
+
+        // 返还水票数量
+        int ticketCount = 0;
+        for (LitemallTicketUserUse ticketUserUse: ticketUserUses) {
+            // 水票状态设置为不生效
+            ticketUserUse.setStatus(0);
+            ticketUserUse.setUpdateTime(LocalDateTime.now());
+            ticketCount = ticketCount + ticketUserUse.getUsedCount();
+
+            ticketUserUseService.updateSelective(ticketUserUse);
+        }
+
+        if (ticketCount > 0) {
+            // 更新水票数量
+            // 根据水票使用记录获取水票信息, 有且只有一个水票使用记录
+            LitemallTicketUser ticketUser = ticketUserService.findById(ticketUserUses.get(0).getTuId());
+            if (ticketUser != null) {
+                ticketUser.setUsedCount(ticketUser.getUsedCount() - ticketCount);
+                ticketUserService.updateSelective(ticketUser);
+            }
         }
     }
 
