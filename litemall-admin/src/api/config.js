@@ -45,6 +45,21 @@ export function updateOrder(data) {
   })
 }
 
+export function listGift() {
+  return request({
+    url: '/config/gift',
+    method: 'get'
+  })
+}
+
+export function updateGift(data) {
+  return request({
+    url: '/config/gift',
+    method: 'post',
+    data
+  })
+}
+
 export function listWx() {
   return request({
     url: '/config/wx',

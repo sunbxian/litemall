@@ -486,6 +486,16 @@ export const asyncRoutes = [
         }
       },
       {
+        path: 'gift',
+        component: () => import('@/views/config/gift'),
+        name: 'configGift',
+        meta: {
+          perms: ['GET /admin/config/gift', 'POST /admin/config/gift'],
+          title: 'app.menu.config_gift',
+          noCache: true
+        }
+      },
+      {
         path: 'wx',
         component: () => import('@/views/config/wx'),
         name: 'configWx',

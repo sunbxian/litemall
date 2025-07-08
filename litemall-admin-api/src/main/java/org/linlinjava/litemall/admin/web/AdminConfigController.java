@@ -76,6 +76,23 @@ public class AdminConfigController {
         return ResponseUtil.ok();
     }
 
+    @RequiresPermissions("admin:config:gift:list")
+    @RequiresPermissionsDesc(menu = {"配置管理", "订单配置"}, button = "详情")
+    @GetMapping("/gift")
+    public Object lisGift() {
+        Map<String, String> data = systemConfigService.listGift();
+        return ResponseUtil.ok(data);
+    }
+
+    @RequiresPermissions("admin:config:gift:updateConfigs")
+    @RequiresPermissionsDesc(menu = {"配置管理", "订单配置"}, button = "编辑")
+    @PostMapping("/gift")
+    public Object updateGift(@RequestBody String body) {
+        Map<String, String> data = JacksonUtil.toMap(body);
+        systemConfigService.updateConfig(data);
+        return ResponseUtil.ok();
+    }
+
     @RequiresPermissions("admin:config:wx:list")
     @RequiresPermissionsDesc(menu = {"配置管理", "小程序配置"}, button = "详情")
     @GetMapping("/wx")

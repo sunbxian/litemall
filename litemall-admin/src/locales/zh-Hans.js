@@ -46,6 +46,7 @@ export default {
       config_mall: '商场配置',
       config_express: '运费配置',
       config_order: '订单配置',
+      config_gift: '赠送配置',
       config_wx: '小程序配置',
       stat: '统计报表',
       stat_user: '用户统计',
@@ -945,6 +946,13 @@ export default {
     form: {
       freight_min: '运费满减所需最低消费',
       freight_value: '运费满减不足所需运费'
+    }
+  },
+  config_gift: {
+    form: {
+      ticket: '贈送水票指定商品',
+      referrer_count: '推荐人可获得水票数量',
+      new_user_count: '新用户注册可获得水票数量'
     }
   },
   config_order: {
