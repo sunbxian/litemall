@@ -675,16 +675,18 @@ public class WxAuthController {
                     return ResponseUtil.fail(409, "不能设置比自己注册时间晚的用户为推荐人");
                 } else {
                     user.setReferrerId(referrerIdId);
+
+                    if (userService.updateById(user) == 0) {
+                        return ResponseUtil.updatedDataFailed();
+                    }
+                    // 赠送推荐人水票
+                    wxOrderService.giftTicket(litemallUser.getId(), SystemConfig.getGiftReferrerCount(), SystemConfig.LITEMALL_GIFT_REFERER_COUNT);
+
                 }
             } else {
                 return ResponseUtil.fail(409, "没有找到该 " +referrerUsername+ " 用户");
             }
-            if (userService.updateById(user) == 0) {
-                return ResponseUtil.updatedDataFailed();
-            }
-            // 赠送推荐人水票
-            wxOrderService.giftTicket(user.getId(), SystemConfig.getGiftReferrerCount(), SystemConfig.LITEMALL_GIFT_REFERER_COUNT);
-        } else {
+         } else {
             return ResponseUtil.badArgument();
         }
 

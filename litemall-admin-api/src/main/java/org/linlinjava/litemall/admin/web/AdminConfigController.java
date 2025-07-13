@@ -77,7 +77,7 @@ public class AdminConfigController {
     }
 
     @RequiresPermissions("admin:config:gift:list")
-    @RequiresPermissionsDesc(menu = {"配置管理", "订单配置"}, button = "详情")
+    @RequiresPermissionsDesc(menu = {"配置管理", "赠送配置"}, button = "详情")
     @GetMapping("/gift")
     public Object lisGift() {
         Map<String, String> data = systemConfigService.listGift();
@@ -85,7 +85,7 @@ public class AdminConfigController {
     }
 
     @RequiresPermissions("admin:config:gift:updateConfigs")
-    @RequiresPermissionsDesc(menu = {"配置管理", "订单配置"}, button = "编辑")
+    @RequiresPermissionsDesc(menu = {"配置管理", "赠送配置"}, button = "编辑")
     @PostMapping("/gift")
     public Object updateGift(@RequestBody String body) {
         Map<String, String> data = JacksonUtil.toMap(body);

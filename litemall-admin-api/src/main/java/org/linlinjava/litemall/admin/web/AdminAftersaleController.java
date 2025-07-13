@@ -53,6 +53,11 @@ public class AdminAftersaleController {
     private WxPayService wxPayService;
     @Autowired
     private NotifyService notifyService;
+    @Autowired
+    private LitemallTicketUserService ticketUserService;
+    @Autowired
+    private LitemallBottleUserService bottleUserService;
+
 
     @RequiresPermissions("admin:aftersale:list")
     @RequiresPermissionsDesc(menu = {"商城管理", "售后管理"}, button = "查询")
@@ -217,6 +222,14 @@ public class AdminAftersaleController {
                 Integer productId = orderGoods.getProductId();
                 Short number = orderGoods.getNumber();
                 goodsProductService.addStock(productId, number);
+
+                if (orderGoods.getType() == 1) {
+                    // 如果是退订押桶， 要将用户的押桶数量减少
+                    bottleUserService.updateSelective(order.getId());
+                } else if (orderGoods.getType() == 2) {
+                    // 如果是退订水票， 就是用户相关水票移除
+                    ticketUserService.updateSelective(order.getId());
+                }
             }
         }
 

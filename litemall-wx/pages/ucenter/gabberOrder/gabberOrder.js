@@ -13,10 +13,10 @@ Page({
     // 页面初始化 options为页面跳转所带来的参数
     let that = this
     try {
-      var tab = wx.getStorageSync('tab');
+      // var tab = wx.getStorageSync('tab');
 
       this.setData({
-        showType: tab
+        showType: 3
       });
     } catch (e) {}
 

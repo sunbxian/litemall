@@ -142,6 +142,13 @@ page {
   font-size: 28rpx;
 }
 
+.order .goods .info .tip { 
+  /* height: 37rpx; */
+  /* line-height: 37rpx; */
+  color: rgb(255, 0, 0);
+  font-size: 24rpx;
+}
+
 .order .goods .status {
   width: 105rpx;
   color: #b4282d;

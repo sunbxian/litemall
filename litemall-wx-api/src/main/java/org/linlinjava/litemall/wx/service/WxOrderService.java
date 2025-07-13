@@ -365,6 +365,70 @@ public class WxOrderService {
     }
 
     /**
+     * 订单详情
+     *
+     * @param userId  用户ID
+     * @param orderId 订单ID
+     * @return 订单详情
+     */
+    public Object todoDetail(Integer userId, Integer orderId) {
+        if (userId == null) {
+            return ResponseUtil.unlogin();
+        }
+
+        // 订单信息
+        LitemallOrder order = orderService.findByGrabId(userId, orderId);
+        if (null == order) {
+            return ResponseUtil.fail(ORDER_UNKNOWN, "订单不存在");
+        }
+        if (!order.getGrabUserId().equals(userId)) {
+            return ResponseUtil.fail(ORDER_INVALID, "不是当前用户的订单");
+        }
+        Map<String, Object> orderVo = new HashMap<String, Object>();
+        orderVo.put("id", order.getId());
+        orderVo.put("orderSn", order.getOrderSn());
+        orderVo.put("message", order.getMessage());
+        orderVo.put("addTime", order.getAddTime());
+        orderVo.put("consignee", order.getConsignee());
+        orderVo.put("mobile", order.getMobile());
+        orderVo.put("address", order.getAddress());
+        orderVo.put("goodsPrice", order.getGoodsPrice());
+        orderVo.put("couponPrice", order.getCouponPrice());
+        orderVo.put("freightPrice", order.getFreightPrice());
+        orderVo.put("actualPrice", order.getActualPrice());
+        orderVo.put("orderStatusText", OrderUtil.orderStatusText(order));
+        orderVo.put("handleOption", OrderUtil.build(order));
+        orderVo.put("aftersaleStatus", order.getAftersaleStatus());
+        orderVo.put("expCode", order.getShipChannel());
+        orderVo.put("expName", expressService.getVendorName(order.getShipChannel()));
+        orderVo.put("expNo", order.getShipSn());
+
+        List<LitemallOrderGoods> orderGoodsList = orderGoodsService.queryByOid(order.getId());
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("orderInfo", orderVo);
+        result.put("orderGoods", orderGoodsList);
+
+        // 订单状态为已发货且物流信息不为空
+        //"YTO", "800669400640887922"
+        if (order.getOrderStatus().equals(OrderUtil.STATUS_SHIP)) {
+            ExpressInfo ei = expressService.getExpressInfo(order.getShipChannel(), order.getShipSn());
+            if(ei == null){
+                result.put("expressInfo", new ArrayList<>());
+            }
+            else {
+                result.put("expressInfo", ei);
+            }
+        }
+        else{
+            result.put("expressInfo", new ArrayList<>());
+        }
+
+        return ResponseUtil.ok(result);
+
+    }
+
+    /**
      * 提交订单
      * <p>
      * 1. 创建订单表项和订单商品表项;
@@ -1142,6 +1206,50 @@ public class WxOrderService {
     }
 
     /**
+     * 确认收货
+     * <p>
+     * 1. 检测当前订单是否能够确认收货；
+     * 2. 设置订单确认收货状态。
+     *
+     * @param userId 用户ID
+     * @param body   订单信息，{ orderId：xxx }
+     * @return 订单操作结果
+     */
+    public Object todoConfirm(Integer userId, String body) {
+        if (userId == null) {
+            return ResponseUtil.unlogin();
+        }
+        Integer orderId = JacksonUtil.parseInteger(body, "orderId");
+        if (orderId == null) {
+            return ResponseUtil.badArgument();
+        }
+
+        LitemallOrder order = orderService.findByGrabId(userId, orderId);
+        if (order == null) {
+            return ResponseUtil.badArgument();
+        }
+        if (!order.getGrabUserId().equals(userId)) {
+            return ResponseUtil.badArgumentValue();
+        }
+
+        OrderHandleOption handleOption = OrderUtil.build(order);
+        if (!handleOption.isConfirm()) {
+            return ResponseUtil.fail(ORDER_INVALID_OPERATION, "订单不能确认收货");
+        }
+
+        Short comments = orderGoodsService.getComments(orderId);
+        order.setComments(comments);
+
+        order.setOrderStatus(OrderUtil.STATUS_CONFIRM);
+        order.setConfirmTime(LocalDateTime.now());
+        if (orderService.updateWithOptimisticLocker(order) == 0) {
+            return ResponseUtil.updatedDateExpired();
+        }
+        return ResponseUtil.ok();
+    }
+
+
+    /**
      * 删除订单
      * <p>
      * 1. 检测当前订单是否可以删除；
@@ -1365,9 +1473,11 @@ public class WxOrderService {
         if (giteType.equals(SystemConfig.LITEMALL_GIFT_NEW_USER_COUNT)) {
             // 赠送水票
             ticketUser.setName("新用户赠送： " + goods.getName() + "水票");
+            ticketUser.setType(0);
         } else if (giteType.equals(SystemConfig.LITEMALL_GIFT_REFERER_COUNT)) {
             // 充值水票
             ticketUser.setName("推荐赠送： " + goods.getName() + "水票");
+            ticketUser.setType(1);
         } else {
             return ResponseUtil.fail(ORDER_INVALID_OPERATION, "水票赠送类型错误");
         }

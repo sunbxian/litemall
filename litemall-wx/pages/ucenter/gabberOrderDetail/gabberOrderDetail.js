@@ -39,7 +39,7 @@ Page({
     }, 2000);
 
     let that = this;
-    util.request(api.OrderDetail, {
+    util.request(api.OrderTodoDetail, {
       orderId: that.data.orderId
     }).then(function(res) {
       if (res.errno === 0) {
@@ -54,116 +54,7 @@ Page({
 
       wx.hideLoading();
     });
-  },
-  // “去付款”按钮点击效果
-  payOrder: function() {
-    let that = this;
-    util.request(api.OrderPrepay, {
-      orderId: that.data.orderId
-    }, 'POST').then(function(res) {
-      if (res.errno === 0) {
-        const payParam = res.data;
-        console.log("支付过程开始");
-        wx.requestPayment({
-          'timeStamp': payParam.timeStamp,
-          'nonceStr': payParam.nonceStr,
-          'package': payParam.packageValue,
-          'signType': payParam.signType,
-          'paySign': payParam.paySign,
-          'success': function(res) {
-            console.log("支付过程成功");
-            util.redirect('/pages/ucenter/order/order');
-          },
-          'fail': function(res) {
-            console.log("支付过程失败");
-            util.showErrorToast('支付失败');
-          },
-          'complete': function(res) {
-            console.log("支付过程结束")
-          }
-        });
-      }
-    });
-
-  },
-  // “取消订单”点击效果
-  cancelOrder: function() {
-    let that = this;
-    let orderInfo = that.data.orderInfo;
-
-    wx.showModal({
-      title: '',
-      content: '确定要取消此订单？',
-      success: function(res) {
-        if (res.confirm) {
-          util.request(api.OrderCancel, {
-            orderId: orderInfo.id
-          }, 'POST').then(function(res) {
-            if (res.errno === 0) {
-              wx.showToast({
-                title: '取消订单成功'
-              });
-              util.redirect('/pages/ucenter/order/order');
-            } else {
-              util.showErrorToast(res.errmsg);
-            }
-          });
-        }
-      }
-    });
-  },
-  // “取消订单并退款”点击效果
-  refundOrder: function() {
-    let that = this;
-    let orderInfo = that.data.orderInfo;
-
-    wx.showModal({
-      title: '',
-      content: '确定要取消此订单？',
-      success: function(res) {
-        if (res.confirm) {
-          util.request(api.OrderRefund, {
-            orderId: orderInfo.id
-          }, 'POST').then(function(res) {
-            if (res.errno === 0) {
-              wx.showToast({
-                title: '取消订单成功'
-              });
-              util.redirect('/pages/ucenter/order/order');
-            } else {
-              util.showErrorToast(res.errmsg);
-            }
-          });
-        }
-      }
-    });
-  },
-  // “删除”点击效果
-  deleteOrder: function() {
-    let that = this;
-    let orderInfo = that.data.orderInfo;
-
-    wx.showModal({
-      title: '',
-      content: '确定要删除此订单？',
-      success: function(res) {
-        if (res.confirm) {
-          util.request(api.OrderDelete, {
-            orderId: orderInfo.id
-          }, 'POST').then(function(res) {
-            if (res.errno === 0) {
-              wx.showToast({
-                title: '删除订单成功'
-              });
-              util.redirect('/pages/ucenter/order/order');
-            } else {
-              util.showErrorToast(res.errmsg);
-            }
-          });
-        }
-      }
-    });
-  },
+  }, 
   // “确认收货”点击效果
   confirmOrder: function() {
     let that = this;
@@ -174,14 +65,14 @@ Page({
       content: '确认收货？',
       success: function(res) {
         if (res.confirm) {
-          util.request(api.OrderConfirm, {
+          util.request(api.OrderTodoConfirm, {
             orderId: orderInfo.id
           }, 'POST').then(function(res) {
             if (res.errno === 0) {
               wx.showToast({
                 title: '确认收货成功！'
               });
-              util.redirect('/pages/ucenter/order/order');
+              util.redirect('/pages/ucenter/gabberOrder/gabberOrder');
             } else {
               util.showErrorToast(res.errmsg);
             }

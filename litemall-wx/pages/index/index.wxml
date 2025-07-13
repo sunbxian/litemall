@@ -53,6 +53,7 @@
             <text class="price">
               <text class="currency">现价: ￥</text>
               <text class="amount">{{iitem.retailPrice}}</text>
+              <text class="currency">  送水到家</text>
             </text>
             <text wx:if="{{iitem.type==2}}" class="count">共{{iitem.ticketCount}}桶</text>
           </view>

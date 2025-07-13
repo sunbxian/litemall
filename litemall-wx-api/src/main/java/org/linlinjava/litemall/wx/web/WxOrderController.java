@@ -99,6 +99,18 @@ public class WxOrderController {
     }
 
     /**
+     * 订单详情
+     *
+     * @param userId  用户ID
+     * @param orderId 订单ID
+     * @return 订单详情
+     */
+    @GetMapping("todoDetail")
+    public Object todoDetail(@LoginUser Integer userId, @NotNull Integer orderId) {
+        return wxOrderService.todoDetail(userId, orderId);
+    }
+
+    /**
      * 提交订单
      *
      * @param userId 用户ID
@@ -183,6 +195,18 @@ public class WxOrderController {
     @PostMapping("confirm")
     public Object confirm(@LoginUser Integer userId, @RequestBody String body) {
         return wxOrderService.confirm(userId, body);
+    }
+
+    /**
+     * 确认收货
+     *
+     * @param userId 用户ID
+     * @param body   订单信息，{ orderId：xxx }
+     * @return 订单操作结果
+     */
+    @PostMapping("todoConfirm")
+    public Object todoConfirm(@LoginUser Integer userId, @RequestBody String body) {
+        return wxOrderService.todoConfirm(userId, body);
     }
 
     /**

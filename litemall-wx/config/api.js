@@ -78,10 +78,12 @@ module.exports = {
   OrderListType: WxApiRoot + 'order/listType', //订单列表
   OrderlistGrab: WxApiRoot + 'order/listGrab', //配送员配送订单列表
   OrderDetail: WxApiRoot + 'order/detail', //订单详情
+  OrderTodoDetail: WxApiRoot + 'order/todoDetail', //配送员订单详情
   OrderCancel: WxApiRoot + 'order/cancel', //取消订单
   OrderRefund: WxApiRoot + 'order/refund', //退款取消订单
   OrderDelete: WxApiRoot + 'order/delete', //删除订单
   OrderConfirm: WxApiRoot + 'order/confirm', //确认收货
+  OrderTodoConfirm: WxApiRoot + 'order/todoConfirm', //配送员确认收货
   OrderGoods: WxApiRoot + 'order/goods', // 代评价商品信息
   OrderComment: WxApiRoot + 'order/comment', // 评价订单商品信息
 

@@ -3,6 +3,7 @@ var api = require('../../../config/api.js');
 
 Page({
   data: {
+    sss: '新用户',
     orderList: [],
     showType: 0,
     page: 1,

@@ -14,6 +14,8 @@
         <view class="info">
           <text class="name">{{gitem.name}}</text>
           <text class="number">共：{{gitem.ticketCount}}桶， 还剩：{{gitem.ticketCount - gitem.usedCount}}桶</text>
+          <text class="tip" wx:if="{{gitem.type == 0 }}">一个地址限五桶</text>
+  
         </view>
         <view class="status"></view>
       </view> 
