@@ -216,6 +216,9 @@ public class WxCartController {
             return ResponseUtil.fail(GOODS_UNSHELVE, "商品已下架");
         }
 
+        // 购物车支持一次一个商品处理， 先清空其他商品
+        cartService.clearGoods(userId);
+
         LitemallGoodsProduct product = productService.findById(productId);
         //判断购物车中是否存在此规格商品
         LitemallCart existCart = cartService.queryExist(goodsId, productId, userId);

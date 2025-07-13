@@ -26,7 +26,7 @@
       </view>
     </view>
   </scroll-view>
-  <scroll-view class="comments">
+  <!-- <scroll-view class="comments">
     <view class="h">
       <text class="t">精选留言</text>
       <van-icon bindtap="postComment" class="i" name="comment-o" />      
@@ -53,8 +53,8 @@
     <view class="no-comments" wx:if="{{commentList.length <= 0}}">
       <text class="txt">等你来留言</text>
     </view>
-  </scroll-view>
-  <scroll-view class="rec-box">
+  </scroll-view> -->
+  <!-- <scroll-view class="rec-box">
     <view class="h">
       <text class="txt">专题推荐</text>
     </view>
@@ -64,5 +64,5 @@
         <text class="title">{{item.title}}</text>
       </navigator>
     </view>
-  </scroll-view>
+  </scroll-view> -->
 </scroll-view>
