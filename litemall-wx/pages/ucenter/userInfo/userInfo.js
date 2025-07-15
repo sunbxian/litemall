@@ -5,6 +5,7 @@ Page({
     avatar: '',
     nickName: '', // 默认值
     gender: 0, // 默认值 
+    mobile: '',
     genderList: [
       { id: 0, name: '未知' },
       { id: 1, name: '男' },
@@ -29,6 +30,7 @@ Page({
           avatar: userData.avatar,
           nickName: userData.nickName, 
           gender: userData.gender,
+          mobile: userData.mobile,
           genderIndex: genderIndex >= 0 ? genderIndex : 0
         });
       } else {

@@ -29,6 +29,7 @@ import org.linlinjava.litemall.db.util.GrouponConstant;
 import org.linlinjava.litemall.db.util.OrderHandleOption;
 import org.linlinjava.litemall.db.util.OrderUtil;
 import org.linlinjava.litemall.core.util.IpUtil;
+import org.linlinjava.litemall.wx.dto.UserInfo;
 import org.linlinjava.litemall.wx.task.OrderUnpaidTask;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -338,6 +339,7 @@ public class WxOrderService {
         orderVo.put("expCode", order.getShipChannel());
         orderVo.put("expName", expressService.getVendorName(order.getShipChannel()));
         orderVo.put("expNo", order.getShipSn());
+        orderVo.put("expTime", order.getShipTime());
 
         List<LitemallOrderGoods> orderGoodsList = orderGoodsService.queryByOid(order.getId());
 
@@ -358,6 +360,19 @@ public class WxOrderService {
         }
         else{
             result.put("expressInfo", new ArrayList<>());
+        }
+
+        if (order.getGrabUserId() != null) {
+            int grabUserId = order.getGrabUserId();
+            LitemallUser user = userService.findById(grabUserId);
+            UserInfo userInfo = new UserInfo();
+            userInfo.setUserName(user.getUsername());
+            userInfo.setNickName(user.getNickname());
+            userInfo.setAvatarUrl(user.getAvatar());
+            userInfo.setMobile(user.getMobile());
+            result.put("grabUserInfo", userInfo);
+        } else {
+            result.put("grabUserInfo", null);
         }
 
         return ResponseUtil.ok(result);

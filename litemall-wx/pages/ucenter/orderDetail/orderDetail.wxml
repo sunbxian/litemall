@@ -24,6 +24,29 @@
     </view>
   </view>
 
+  <view class="grab-info" wx:if="{{ grabUserInfo!=null }}"> 
+    <view class="order-bottom">
+      <view class="total">
+        <view class="t">
+          <text class="label">配送时间：</text>
+          <text class="txt">{{orderInfo.expTime}}</text>  
+        </view>
+      </view>
+      <view class="total">
+        <view class="t">
+          <text class="label">配送员：</text>
+          <text class="txt">{{grabUserInfo.nickName}}</text>  
+        </view>
+      </view>
+      <view class="total" bindtap="callPhone">
+        <view class="t">
+          <text class="label">配送员手机：</text>
+          <text class="phone">{{grabUserInfo.mobile}}</text>  
+        </view>
+      </view>
+    </view> 
+  </view> 
+
   <view class="order-goods">
     <view class="h">
       <view class="label">商品信息</view>
@@ -95,4 +118,6 @@
       </view>
     </view>
   </view>
+  <view class="active">
+  </view> 
 </view>

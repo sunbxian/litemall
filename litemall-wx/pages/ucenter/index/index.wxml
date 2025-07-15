@@ -82,19 +82,19 @@
         <view class='user_column_item_text'>地址管理</view>
       </view>
     </view>
-    <view class='user_column_row'>
-      <!-- <button class="user_column_item_phone" open-type="getPhoneNumber" bindgetphonenumber="bindPhoneNumber">
-        <image class='user_column_item_image' src='/static/images/mobile.png'></image>
-        <view class='user_column_item_text'>绑定手机</view>
-      </button> -->
+    <view class='user_column_row'> 
       <view class='user_column_item' bindtap='setReferrer'>
         <image class='user_column_item_image' src='/static/images/recommend.png'></image>
         <view class='user_column_item_text'>推荐人</view>
       </view> 
-      <view class='user_column_item' bindtap='goHelp'>
+      <button class="user_column_item_phone" open-type="getPhoneNumber" bindgetphonenumber="bindPhoneNumber">
+        <image class='user_column_item_image' src='/static/images/mobile.png'></image>
+        <view class='user_column_item_text'>绑定手机</view>
+      </button>
+      <!-- <view class='user_column_item' bindtap='goHelp'>
         <image class='user_column_item_image' src='/static/images/help.png'></image>
         <view class='user_column_item_text'>帮助中心</view>
-      </view>
+      </view> -->
       <view class='user_column_item' bindtap='goFeedback'>
         <image class='user_column_item_image' src='/static/images/feedback.png'></image>
         <view class='user_column_item_text'>意见反馈</view>

@@ -279,3 +279,14 @@ page {
 .order-express .acceptStation {
   font-size: 26rpx;
 }
+
+.grab-info {
+  margin-top: 20rpx;
+  background: #fff;
+}
+
+.grab-info .order-bottom .total .t .phone {
+  font-size: 29rpx;
+  margin-left: 10rpx;
+  color: #a78845;
+}

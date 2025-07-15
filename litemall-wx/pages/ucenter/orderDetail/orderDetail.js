@@ -7,6 +7,7 @@ Page({
     orderInfo: {},
     orderGoods: [],
     expressInfo: {},
+    grabUserInfo: null,
     flag: false,
     handleOption: {}
   },
@@ -48,7 +49,8 @@ Page({
           orderInfo: res.data.orderInfo,
           orderGoods: res.data.orderGoods,
           handleOption: res.data.orderInfo.handleOption,
-          expressInfo: res.data.expressInfo
+          expressInfo: res.data.expressInfo,
+          grabUserInfo: res.data.grabUserInfo,
         });
       }
 
@@ -198,6 +200,12 @@ Page({
     else{
       util.redirect('/pages/ucenter/aftersaleDetail/aftersaleDetail?id=' + this.data.orderId);
     }
+  },
+  callPhone: function (e) {
+    var that = this 
+    wx.makePhoneCall({
+      phoneNumber: that.data.grabUserInfo.mobile,
+    })
   },
   onReady: function() {
     // 页面渲染完成
