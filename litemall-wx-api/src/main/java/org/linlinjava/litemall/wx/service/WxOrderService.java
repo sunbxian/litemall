@@ -1054,6 +1054,7 @@ public class WxOrderService {
                 ticketUser.setPicUrl(orderGoods.getPicUrl());
                 ticketUser.setTicketCount(orderGoods.getTicketCount());
                 ticketUser.setTicketGiftCount(orderGoods.getTicketGiftCount());
+                ticketUser.setType(2);
                 ticketUser.setStatus(1);
 
                 if (ticketUserService.add(ticketUser) == 0) {
