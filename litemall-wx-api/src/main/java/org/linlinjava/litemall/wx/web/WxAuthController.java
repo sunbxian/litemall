@@ -3,6 +3,9 @@ package org.linlinjava.litemall.wx.web;
 import cn.binarywang.wx.miniapp.api.WxMaService;
 import cn.binarywang.wx.miniapp.bean.WxMaJscode2SessionResult;
 import cn.binarywang.wx.miniapp.bean.WxMaPhoneNumberInfo;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -25,7 +28,11 @@ import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.crypto.Cipher;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServletRequest;
+import java.security.spec.AlgorithmParameterSpec;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -219,8 +226,12 @@ public class WxAuthController {
             sessionKey = result.getSessionKey();
             openId = result.getOpenid();
 
-            WxMaPhoneNumberInfo phoneNumberInfo = this.wxService.getUserService().getPhoneNoInfo(sessionKey, encryptedData, iv);
-            phone = phoneNumberInfo.getPhoneNumber();
+            JsonNode jsonObject =  decryptPhoneNumber(sessionKey, encryptedData, iv);
+            if (jsonObject != null) {
+                phone = jsonObject.get("phoneNumber").asText();
+            } else {
+                return ResponseUtil.fail(AUTH_INVALID_MOBILE, "手机号获取失败");
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -268,6 +279,7 @@ public class WxAuthController {
             user.setLastLoginTime(LocalDateTime.now());
             user.setLastLoginIp(IpUtil.getIpAddr(request));
             user.setSessionKey(sessionKey);
+            user.setMobile(phone);
             if (userService.updateById(user) == 0) {
                 return ResponseUtil.updatedDataFailed();
             }
@@ -412,7 +424,7 @@ public class WxAuthController {
         user.setPassword(encodedPassword);
         user.setMobile(mobile);
         user.setWeixinOpenid(openId);
-        user.setAvatar("https://yanxuan.nosdn.127.net/80841d741d7fa3073e0ae27bf487339f.jpg?imageView&quality=90&thumbnail=64x64");
+        user.setAvatar("https://api.dicebear.com/7.x/pixel-art/svg?seed=" + username);
         user.setNickname(username);
         user.setGender((byte) 0);
         user.setUserLevel((byte) 0);
@@ -740,4 +752,39 @@ public class WxAuthController {
 
         return ResponseUtil.ok(data);
     }
+
+    /**
+     * 获取微信手机号
+     *
+     * @param session_key
+     * @param encryptedData
+     * @param iv
+     * @return
+     */
+    private JsonNode decryptPhoneNumber(String session_key, String encryptedData, String iv) {
+        byte[] encryptedByteData = Base64.decodeBase64(encryptedData);
+        byte[] ivData = Base64.decodeBase64(iv);
+        byte[] sKey = Base64.decodeBase64(session_key);
+        try {
+            logger.info("-----start decrypt = ");
+            AlgorithmParameterSpec ivSpec = new IvParameterSpec(ivData);
+            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            SecretKeySpec keySpec = new SecretKeySpec(sKey, "AES");
+            cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec);
+
+            //解析解密后的字符串
+            byte[] resultByte = cipher.doFinal(encryptedByteData);
+            if (null != resultByte && resultByte.length > 0) {
+                String result = new String(resultByte, "UTF-8");
+                ObjectMapper mapper = new ObjectMapper();
+                JsonNode jsonNode = mapper.readTree(result);
+                return jsonNode;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+        return null;
+    }
+
 }
