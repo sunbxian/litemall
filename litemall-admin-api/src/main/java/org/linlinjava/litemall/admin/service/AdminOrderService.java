@@ -120,40 +120,53 @@ public class AdminOrderService {
             return ResponseUtil.fail(ORDER_CONFIRM_NOT_ALLOWED, "订单不能确认收货");
         }
 
-        // 微信退款
-        WxPayRefundRequest wxPayRefundRequest = new WxPayRefundRequest();
-        wxPayRefundRequest.setOutTradeNo(order.getOrderSn());
-        wxPayRefundRequest.setOutRefundNo("refund_" + order.getOrderSn());
-        // 元转成分
-        Integer totalFee = order.getActualPrice().multiply(new BigDecimal(100)).intValue();
-        wxPayRefundRequest.setTotalFee(totalFee);
-        wxPayRefundRequest.setRefundFee(totalFee);
+        if (order.getPayId() != null) {
+            // 微信退款
+            WxPayRefundRequest wxPayRefundRequest = new WxPayRefundRequest();
+            wxPayRefundRequest.setOutTradeNo(order.getOrderSn());
+            wxPayRefundRequest.setOutRefundNo("refund_" + order.getOrderSn());
+            // 元转成分
+            Integer totalFee = order.getActualPrice().multiply(new BigDecimal(100)).intValue();
+            wxPayRefundRequest.setTotalFee(totalFee);
+            wxPayRefundRequest.setRefundFee(totalFee);
 
-        WxPayRefundResult wxPayRefundResult;
-        try {
-            wxPayRefundResult = wxPayService.refund(wxPayRefundRequest);
-        } catch (WxPayException e) {
-            logger.error(e.getMessage(), e);
-            return ResponseUtil.fail(ORDER_REFUND_FAILED, "订单退款失败");
-        }
-        if (!wxPayRefundResult.getReturnCode().equals("SUCCESS")) {
-            logger.warn("refund fail: " + wxPayRefundResult.getReturnMsg());
-            return ResponseUtil.fail(ORDER_REFUND_FAILED, "订单退款失败");
-        }
-        if (!wxPayRefundResult.getResultCode().equals("SUCCESS")) {
-            logger.warn("refund fail: " + wxPayRefundResult.getReturnMsg());
-            return ResponseUtil.fail(ORDER_REFUND_FAILED, "订单退款失败");
+            WxPayRefundResult wxPayRefundResult;
+            try {
+                wxPayRefundResult = wxPayService.refund(wxPayRefundRequest);
+            } catch (WxPayException e) {
+                logger.error(e.getMessage(), e);
+                return ResponseUtil.fail(ORDER_REFUND_FAILED, "订单退款失败");
+            }
+            if (!wxPayRefundResult.getReturnCode().equals("SUCCESS")) {
+                logger.warn("refund fail: " + wxPayRefundResult.getReturnMsg());
+                return ResponseUtil.fail(ORDER_REFUND_FAILED, "订单退款失败");
+            }
+            if (!wxPayRefundResult.getResultCode().equals("SUCCESS")) {
+                logger.warn("refund fail: " + wxPayRefundResult.getReturnMsg());
+                return ResponseUtil.fail(ORDER_REFUND_FAILED, "订单退款失败");
+            }
+            LocalDateTime now = LocalDateTime.now();
+            // 设置订单取消状态
+            order.setOrderStatus(OrderUtil.STATUS_REFUND_CONFIRM);
+            order.setEndTime(now);
+            // 记录订单退款相关信息
+            order.setRefundAmount(order.getActualPrice());
+            order.setRefundType("微信退款接口");
+            order.setRefundContent(wxPayRefundResult.getRefundId());
+            order.setRefundTime(now);
+        } else {
+            // 线下退款
+            LocalDateTime now = LocalDateTime.now();
+            // 设置订单取消状态
+            order.setOrderStatus(OrderUtil.STATUS_REFUND_CONFIRM);
+            order.setEndTime(now);
+            // 记录订单退款相关信息
+            order.setRefundAmount(order.getActualPrice());
+            order.setRefundType("水票退单");
+            order.setRefundContent("水票退单");
+            order.setRefundTime(now);
         }
 
-        LocalDateTime now = LocalDateTime.now();
-        // 设置订单取消状态
-        order.setOrderStatus(OrderUtil.STATUS_REFUND_CONFIRM);
-        order.setEndTime(now);
-        // 记录订单退款相关信息
-        order.setRefundAmount(order.getActualPrice());
-        order.setRefundType("微信退款接口");
-        order.setRefundContent(wxPayRefundResult.getRefundId());
-        order.setRefundTime(now);
         if (orderService.updateWithOptimisticLocker(order) == 0) {
             throw new RuntimeException("更新数据已失效");
         }

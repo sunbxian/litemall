@@ -242,7 +242,7 @@ public class WxAuthController {
             user.setUsername(username);
             user.setPassword(openId);
             user.setWeixinOpenid(openId);
-            user.setAvatar("https://yanxuan.nosdn.127.net/80841d741d7fa3073e0ae27bf487339f.jpg?imageView&quality=90&thumbnail=64x64");
+            user.setAvatar("https://api.dicebear.com/7.x/pixel-art/svg?seed=" + username);
             user.setNickname("用户" + username);
             user.setGender((byte) 0);
             user.setUserLevel((byte) 0);

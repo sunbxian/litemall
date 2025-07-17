@@ -279,3 +279,9 @@ page {
 .order-express .acceptStation {
   font-size: 26rpx;
 }
+
+.order-bottom .address .t .mobile {
+  font-size: 29rpx;
+  margin-left: 10rpx;
+  color: #a78845;
+}

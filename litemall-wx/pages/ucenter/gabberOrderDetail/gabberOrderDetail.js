@@ -90,6 +90,13 @@ Page({
       util.redirect('/pages/ucenter/aftersaleDetail/aftersaleDetail?id=' + this.data.orderId);
     }
   },
+  callPhone: function (e) {
+    var that = this 
+    console.log(that.data.orderInfo.mobile)
+    wx.makePhoneCall({
+      phoneNumber: that.data.orderInfo.mobile,
+    })
+  },
   onReady: function() {
     // 页面渲染完成
   },

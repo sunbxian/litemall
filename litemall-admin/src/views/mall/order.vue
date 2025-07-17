@@ -46,7 +46,7 @@
 
       <el-table-column align="center" :label="$t('mall_order.table.avatar')" width="80">
         <template slot-scope="scope">
-          <el-avatar :src="scope.row.avatar" />
+          <el-avatar :src="scope.row.userAvatar" />
         </template>
       </el-table-column>
 
