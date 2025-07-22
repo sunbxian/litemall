@@ -51,6 +51,7 @@ export default {
       stat: '统计报表',
       stat_user: '用户统计',
       stat_order: '订单统计',
+      stat_grab_order: '配送员统计',
       stat_goods: '商品统计',
       external_link: '外链',
       external_link_tencent_cos: '腾讯云存储',

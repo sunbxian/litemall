@@ -21,21 +21,22 @@
       @click="handleFilter"
     >{{ $t('app.button.search') }}
     </el-button>
+
     <el-table
       :data="users"
       border
       style="width: 100%"
     >
-      <el-table-column prop="day" label="用户 ID" width="100" />
-      <el-table-column prop="orders" label="订单量" />
-      <el-table-column prop="customers" label="下单用户" />
-      <el-table-column prop="amount" label="订单总额(元)" />
+      <el-table-column prop="grab_user_id" label="用户 ID" width="100" />
+      <el-table-column prop="nickname" label="配送员" />
+      <el-table-column prop="total_grab_orders" label="接单数" />
+      <el-table-column prop="total_water_delivered" label="送水量（桶）" />
     </el-table>
   </div>
 </template>
 
 <script>
-import { statOrder } from '@/api/stat'
+import { statGrabOrder } from '@/api/stat'
 
 export default {
   data() {
@@ -90,7 +91,7 @@ export default {
         this.listQuery.start = null
         this.listQuery.end = null
       }
-      statOrder(this.listQuery).then(response => {
+      statGrabOrder(this.listQuery).then(response => {
         this.users = response.data.data.rows
       })
     }

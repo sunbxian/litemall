@@ -8,11 +8,14 @@ import org.linlinjava.litemall.admin.vo.StatVo;
 import org.linlinjava.litemall.core.util.ResponseUtil;
 import org.linlinjava.litemall.db.service.StatService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -40,8 +43,9 @@ public class AdminStatController {
     @RequiresPermissions("admin:stat:order")
     @RequiresPermissionsDesc(menu = {"统计管理", "订单统计"}, button = "查询")
     @GetMapping("/order")
-    public Object statOrder() {
-        List<Map> rows = statService.statOrder();
+    public Object statOrder(@RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime start,
+                            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime end) {
+        List<Map> rows = statService.statOrder(start, end);
         String[] columns = new String[]{"day", "orders", "customers", "amount", "pcr"};
         StatVo statVo = new StatVo();
         statVo.setColumns(columns);
@@ -59,6 +63,20 @@ public class AdminStatController {
         StatVo statVo = new StatVo();
         statVo.setColumns(columns);
         statVo.setRows(rows);
+        return ResponseUtil.ok(statVo);
+    }
+
+    @RequiresPermissions("admin:stat:grabOrder")
+    @RequiresPermissionsDesc(menu = {"统计管理", "配送员统计"}, button = "查询")
+    @GetMapping("/grabOrder")
+    public Object statGrabOrder(@RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime start,
+                                @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime end) {
+        List<Map> rows = statService.statGrabOrder(start, end);
+        String[] columns = new String[]{"grab_user_id", "username", "nickname", "total_grab_orders", "total_water_delivered"};
+        StatVo statVo = new StatVo();
+        statVo.setColumns(columns);
+        statVo.setRows(rows);
+
         return ResponseUtil.ok(statVo);
     }
 

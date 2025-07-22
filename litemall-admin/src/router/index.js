@@ -548,6 +548,16 @@ export const asyncRoutes = [
           title: 'app.menu.stat_goods',
           noCache: true
         }
+      },
+      {
+        path: 'grabOrder',
+        component: () => import('@/views/stat/grabOrder'),
+        name: 'grabOrder',
+        meta: {
+          perms: ['GET /admin/stat/grabOrder'],
+          title: 'app.menu.stat_grab_order',
+          noCache: true
+        }
       }
     ]
   },

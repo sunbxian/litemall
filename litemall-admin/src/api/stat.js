@@ -23,3 +23,11 @@ export function statGoods(query) {
     params: query
   })
 }
+
+export function statGrabOrder(query) {
+  return request({
+    url: '/stat/grabOrder',
+    method: 'get',
+    params: query
+  })
+}

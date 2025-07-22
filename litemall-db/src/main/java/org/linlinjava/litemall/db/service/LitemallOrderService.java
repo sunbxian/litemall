@@ -271,7 +271,7 @@ public class LitemallOrderService {
         if (orderStatusArray != null && orderStatusArray.size() > 0) {
             querys.add(" o.order_status in (" + StringUtils.collectionToDelimitedString(orderStatusArray, ",") + ") ");
         }
-        querys.add(" o.deleted = 0 and og.deleted = 0 ");
+//        querys.add(" o.deleted = 0 and og.deleted = 0 ");
         String query = StringUtils.collectionToDelimitedString(querys, "and");
         String orderByClause = null;
         if (!StringUtils.isEmpty(sort) && !StringUtils.isEmpty(order)) {

@@ -271,7 +271,7 @@ public class AdminOrderService {
         //TODO 发送邮件和短信通知，这里采用异步发送
         // 送水会发送通知短信给用户:          *
         // "您的订单已经发货，送水员 {1}，电话 {2} ，请注意查收"
-        notifyService.notifySmsTemplate(order.getMobile(), NotifyType.WATER, new String[]{grabName, grabPhone});
+        notifyService.notifySmsTemplate(grabPhone, NotifyType.WATER, new String[]{grabName, grabPhone});
 
         logHelper.logOrderSucceed("送水", "订单编号 " + order.getOrderSn());
         return ResponseUtil.ok();
