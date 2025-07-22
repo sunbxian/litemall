@@ -16,10 +16,7 @@ import org.linlinjava.litemall.core.util.JacksonUtil;
 import org.linlinjava.litemall.core.util.ResponseUtil;
 import org.linlinjava.litemall.core.validator.Order;
 import org.linlinjava.litemall.core.validator.Sort;
-import org.linlinjava.litemall.db.domain.LitemallAftersale;
-import org.linlinjava.litemall.db.domain.LitemallGoodsProduct;
-import org.linlinjava.litemall.db.domain.LitemallOrder;
-import org.linlinjava.litemall.db.domain.LitemallOrderGoods;
+import org.linlinjava.litemall.db.domain.*;
 import org.linlinjava.litemall.db.service.*;
 import org.linlinjava.litemall.db.util.AftersaleConstant;
 import org.linlinjava.litemall.db.util.OrderUtil;
@@ -57,7 +54,8 @@ public class AdminAftersaleController {
     private LitemallTicketUserService ticketUserService;
     @Autowired
     private LitemallBottleUserService bottleUserService;
-
+    @Autowired
+    private LitemallTicketUserUseService ticketUserUseService;
 
     @RequiresPermissions("admin:aftersale:list")
     @RequiresPermissionsDesc(menu = {"商场管理", "售后管理"}, button = "查询")
@@ -182,29 +180,31 @@ public class AdminAftersaleController {
         Integer orderId = aftersaleOne.getOrderId();
         LitemallOrder order = orderService.findById(orderId);
 
-        // 微信退款
-        WxPayRefundRequest wxPayRefundRequest = new WxPayRefundRequest();
-        wxPayRefundRequest.setOutTradeNo(order.getOrderSn());
-        wxPayRefundRequest.setOutRefundNo("refund_" + order.getOrderSn());
-        // 元转成分
-        Integer totalFee = aftersaleOne.getAmount().multiply(new BigDecimal(100)).intValue();
-        wxPayRefundRequest.setTotalFee(order.getActualPrice().multiply(new BigDecimal(100)).intValue());
-        wxPayRefundRequest.setRefundFee(totalFee);
+        if (order.getPayId() != null) {
+            // 微信退款
+            WxPayRefundRequest wxPayRefundRequest = new WxPayRefundRequest();
+            wxPayRefundRequest.setOutTradeNo(order.getOrderSn());
+            wxPayRefundRequest.setOutRefundNo("refund_" + order.getOrderSn());
+            // 元转成分
+            Integer totalFee = aftersaleOne.getAmount().multiply(new BigDecimal(100)).intValue();
+            wxPayRefundRequest.setTotalFee(order.getActualPrice().multiply(new BigDecimal(100)).intValue());
+            wxPayRefundRequest.setRefundFee(totalFee);
 
-        WxPayRefundResult wxPayRefundResult;
-        try {
-            wxPayRefundResult = wxPayService.refund(wxPayRefundRequest);
-        } catch (WxPayException e) {
-            logger.error(e.getMessage(), e);
-            return ResponseUtil.fail(ORDER_REFUND_FAILED, "订单退款失败");
-        }
-        if (!wxPayRefundResult.getReturnCode().equals("SUCCESS")) {
-            logger.warn("refund fail: " + wxPayRefundResult.getReturnMsg());
-            return ResponseUtil.fail(ORDER_REFUND_FAILED, "订单退款失败");
-        }
-        if (!wxPayRefundResult.getResultCode().equals("SUCCESS")) {
-            logger.warn("refund fail: " + wxPayRefundResult.getReturnMsg());
-            return ResponseUtil.fail(ORDER_REFUND_FAILED, "订单退款失败");
+            WxPayRefundResult wxPayRefundResult;
+            try {
+                wxPayRefundResult = wxPayService.refund(wxPayRefundRequest);
+            } catch (WxPayException e) {
+                logger.error(e.getMessage(), e);
+                return ResponseUtil.fail(ORDER_REFUND_FAILED, "订单退款失败");
+            }
+            if (!wxPayRefundResult.getReturnCode().equals("SUCCESS")) {
+                logger.warn("refund fail: " + wxPayRefundResult.getReturnMsg());
+                return ResponseUtil.fail(ORDER_REFUND_FAILED, "订单退款失败");
+            }
+            if (!wxPayRefundResult.getResultCode().equals("SUCCESS")) {
+                logger.warn("refund fail: " + wxPayRefundResult.getReturnMsg());
+                return ResponseUtil.fail(ORDER_REFUND_FAILED, "订单退款失败");
+            }
         }
 
         aftersaleOne.setStatus(AftersaleConstant.STATUS_REFUND);
@@ -230,6 +230,29 @@ public class AdminAftersaleController {
                     // 如果是退订水票， 就是用户相关水票移除
                     ticketUserService.updateSelective(order.getId());
                 }
+            }
+        }
+
+        List<LitemallTicketUserUse> ticketUserUses = ticketUserUseService.findByOid(orderId);
+
+        // 返还水票数量
+        int ticketCount = 0;
+        for (LitemallTicketUserUse ticketUserUse: ticketUserUses) {
+            // 水票状态设置为不生效
+            ticketUserUse.setStatus(0);
+            ticketUserUse.setUpdateTime(LocalDateTime.now());
+            ticketCount = ticketCount + ticketUserUse.getUsedCount();
+
+            ticketUserUseService.updateSelective(ticketUserUse);
+        }
+
+        if (ticketCount > 0) {
+            // 更新水票数量
+            // 根据水票使用记录获取水票信息, 有且只有一个水票使用记录
+            LitemallTicketUser ticketUser = ticketUserService.findById(ticketUserUses.get(0).getTuId());
+            if (ticketUser != null) {
+                ticketUser.setUsedCount(ticketUser.getUsedCount() - ticketCount);
+                ticketUserService.updateByPrimaryKeySelective(ticketUser);
             }
         }
 

@@ -69,6 +69,9 @@
         <el-form-item :label="$t('user_user.form.mobile')" prop="mobile">
           <el-input v-model="userDetail.mobile" />
         </el-form-item>
+        <el-form-item :label="$t('user_user.form.email')" prop="mobile">
+          <el-input v-model="userDetail.email" />
+        </el-form-item>
         <el-form-item :label="$t('user_user.form.gender')" prop="gender">
           <el-select v-model="userDetail.gender" :placeholder="$t('user_user.placeholder.gender')"><el-option v-for="(item, index) in genderDic" :key="index" :label="item" :value="index" /></el-select>
         </el-form-item>
@@ -124,7 +127,7 @@ export default {
       statusDic: ['可用', '禁用', '注销'],
       roleDic: {
         'user': '用户',
-        'grabber': '送水员',
+        'grabber': '配送员',
         'admin': '管理员'
       },
       userDialogVisible: false,

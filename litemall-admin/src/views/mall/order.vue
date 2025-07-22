@@ -413,7 +413,8 @@ export default {
         orderId: undefined,
         grabUserId: undefined,
         grabName: '',
-        grabPhone: ''
+        grabPhone: '',
+        grabEmail: ''
       },
       userOptions: [],
       userSearchLoading: false,
@@ -545,10 +546,12 @@ export default {
         this.waterForm.grabUserId = selectedUser.id
         this.waterForm.grabName = selectedUser.nickname
         this.waterForm.grabPhone = selectedUser.mobile
+        this.waterForm.grabEmail = selectedUser.email
       } else {
         this.waterForm.grabUserId = null
         this.waterForm.grabName = ''
         this.waterForm.grabPhone = ''
+        this.waterForm.grabEmail = ''
       }
     },
     searchUsers(query) {
@@ -588,7 +591,7 @@ export default {
             this.waterDialogVisible = false
             this.$notify.success({
               title: '成功',
-              message: '确认送水成功'
+              message: '确认配送成功'
             })
             this.getList()
           }).catch(response => {

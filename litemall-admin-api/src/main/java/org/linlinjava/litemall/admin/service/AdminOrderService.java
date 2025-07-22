@@ -233,7 +233,7 @@ public class AdminOrderService {
 
     /**
      * 送水
-     * 1. 检测当前订单是否能够送水
+     * 1. 检测当前订单是否能够配送
      * 2. 设置订单发货状态
      *
      * @param body 订单信息，{ orderId：xxx, grabUserId: xxx }
@@ -246,6 +246,7 @@ public class AdminOrderService {
         Integer grabUserId = JacksonUtil.parseInteger(body, "grabUserId");
         String grabName = JacksonUtil.parseString(body, "grabName");
         String grabPhone = JacksonUtil.parseString(body, "grabPhone");
+        String grabEmail = JacksonUtil.parseString(body, "grabEmail");
 
         if (orderId == null || grabUserId == null) {
             return ResponseUtil.badArgument();
@@ -256,9 +257,9 @@ public class AdminOrderService {
             return ResponseUtil.badArgument();
         }
 
-        // 如果订单不是已付款状态，则不能送水
+        // 如果订单不是已付款状态，则不能配送
         if (!order.getOrderStatus().equals(OrderUtil.STATUS_PAY)) {
-            return ResponseUtil.fail(ORDER_CONFIRM_NOT_ALLOWED, "订单不能送水");
+            return ResponseUtil.fail(ORDER_CONFIRM_NOT_ALLOWED, "订单已经配送");
         }
 
         order.setOrderStatus(OrderUtil.STATUS_SHIP);
@@ -272,6 +273,16 @@ public class AdminOrderService {
         // 送水会发送通知短信给用户:          *
         // "您的订单已经发货，送水员 {1}，电话 {2} ，请注意查收"
         notifyService.notifySmsTemplate(grabPhone, NotifyType.WATER, new String[]{grabName, grabPhone});
+
+        String sb = " [" +
+                "订单号：" + order.getOrderSn() +
+                ", 订单用户：" + order.getConsignee() +
+                ", 订单用户手机：" + order.getMobile() +
+                ", 订单地址：" + order.getAddress() +
+                ", 开始配送时间：" + order.getShipTime() +
+                "]";
+
+        notifyService.notifyMail("你有新的配送订单", sb, grabEmail);
 
         logHelper.logOrderSucceed("送水", "订单编号 " + order.getOrderSn());
         return ResponseUtil.ok();

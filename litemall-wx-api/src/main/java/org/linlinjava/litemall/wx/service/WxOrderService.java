@@ -778,9 +778,18 @@ public class WxOrderService {
                 }
             }
 
+            String sb = " [" +
+                    "订单号：" + order.getOrderSn() +
+                    ", 订单用户：" + order.getConsignee() +
+                    ", 订单用户手机：" + order.getMobile() +
+                    ", 订单地址：" + order.getAddress() +
+                    ", 订单金额：" + order.getOrderPrice() +
+                    ", 订单实际金额：" + order.getActualPrice() +
+                    "]";
+
             //TODO 发送邮件和短信通知，这里采用异步发送
             // 订单支付成功以后，会发送短信给用户，以及发送邮件给管理员
-            notifyService.notifyMail("新订单通知", order.toString());
+            notifyService.notifyMail("新订单通知", sb);
             // 这里微信的短信平台对参数长度有限制，所以将订单号只截取后6位
             notifyService.notifySmsTemplateSync(order.getMobile(), NotifyType.PAY_SUCCEED, new String[]{order.getOrderSn().substring(8, 14)});
         }

@@ -99,6 +99,19 @@ public class NotifyService {
         mailSender.send(message);
     }
 
+    @Async
+    public void notifyMail(String subject, String content, String sendToEmail) {
+        if (mailSender == null)
+            return;
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom(sendFrom);
+        message.setTo(sendToEmail);
+        message.setSubject(subject);
+        message.setText(content);
+        mailSender.send(message);
+    }
+
     private String getTemplateId(NotifyType notifyType, List<Map<String, String>> values) {
         for (Map<String, String> item : values) {
             String notifyTypeStr = notifyType.getType();
