@@ -205,13 +205,32 @@ public class AdminAftersaleController {
                 logger.warn("refund fail: " + wxPayRefundResult.getReturnMsg());
                 return ResponseUtil.fail(ORDER_REFUND_FAILED, "订单退款失败");
             }
+
+            LocalDateTime now = LocalDateTime.now();
+            // 记录订单退款相关信息
+            order.setRefundAmount(order.getActualPrice());
+            order.setRefundType("微信退款接口");
+            order.setRefundContent(wxPayRefundResult.getRefundId());
+            order.setRefundTime(now);
+        } else {
+            // 线下退款
+            LocalDateTime now = LocalDateTime.now();
+            // 记录订单退款相关信息
+            order.setRefundAmount(order.getActualPrice());
+            order.setRefundType("水票退单");
+            order.setRefundContent("水票退单");
+            order.setRefundTime(now);
+
         }
 
         aftersaleOne.setStatus(AftersaleConstant.STATUS_REFUND);
         aftersaleOne.setHandleTime(LocalDateTime.now());
         aftersaleService.updateById(aftersaleOne);
 
-        orderService.updateAftersaleStatus(orderId, AftersaleConstant.STATUS_REFUND);
+        order.setAftersaleStatus(AftersaleConstant.STATUS_REFUND);
+        if (orderService.updateWithOptimisticLocker(order) == 0) {
+            throw new RuntimeException("更新数据已失效");
+        }
 
         // NOTE
         // 如果是“退货退款”类型的售后，这里退款说明用户的货已经退回，则需要商品货品数量增加
