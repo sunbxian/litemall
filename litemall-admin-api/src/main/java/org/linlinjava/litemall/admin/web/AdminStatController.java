@@ -40,6 +40,7 @@ public class AdminStatController {
         return ResponseUtil.ok(statVo);
     }
 
+
     @RequiresPermissions("admin:stat:order")
     @RequiresPermissionsDesc(menu = {"统计管理", "订单统计"}, button = "查询")
     @GetMapping("/order")
@@ -64,6 +65,18 @@ public class AdminStatController {
         statVo.setColumns(columns);
         statVo.setRows(rows);
         return ResponseUtil.ok(statVo);
+    }
+
+    @RequiresPermissions("admin:stat:userOrder")
+    @RequiresPermissionsDesc(menu = {"统计管理", "用户订单统计"}, button = "查询")
+    @GetMapping("/userOrder")
+    public Object statUserOrder(  String nickname, @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime start,
+                                @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime end,
+                                  @RequestParam(defaultValue = "1") Integer page,
+                                  @RequestParam(defaultValue = "10") Integer limit) {
+
+        Map<String, Object> data = (Map)statService.statUserOrder(nickname, start, end, page, limit);
+        return ResponseUtil.ok(data);
     }
 
     @RequiresPermissions("admin:stat:grabOrder")

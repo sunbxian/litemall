@@ -12,5 +12,7 @@ public interface StatMapper {
 
     List<Map> statGoods();
 
+    List<Map> statUserOrder(@Param("query") String query);
+
     List<Map> statGrabOrder(@Param("query") String query);
 }

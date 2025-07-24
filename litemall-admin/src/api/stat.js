@@ -24,6 +24,14 @@ export function statGoods(query) {
   })
 }
 
+export function statUserOrder(query) {
+  return request({
+    url: '/stat/userOrder',
+    method: 'get',
+    params: query
+  })
+}
+
 export function statGrabOrder(query) {
   return request({
     url: '/stat/grabOrder',

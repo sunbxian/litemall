@@ -540,12 +540,12 @@ export const asyncRoutes = [
         }
       },
       {
-        path: 'goods',
-        component: () => import('@/views/stat/goods'),
-        name: 'statGoods',
+        path: 'userOrder',
+        component: () => import('@/views/stat/userOrder'),
+        name: 'userOrder',
         meta: {
-          perms: ['GET /admin/stat/goods'],
-          title: 'app.menu.stat_goods',
+          perms: ['GET /admin/stat/userOrder'],
+          title: 'app.menu.stat_user_order',
           noCache: true
         }
       },
@@ -556,6 +556,16 @@ export const asyncRoutes = [
         meta: {
           perms: ['GET /admin/stat/grabOrder'],
           title: 'app.menu.stat_grab_order',
+          noCache: true
+        }
+      },
+      {
+        path: 'goods',
+        component: () => import('@/views/stat/goods'),
+        name: 'statGoods',
+        meta: {
+          perms: ['GET /admin/stat/goods'],
+          title: 'app.menu.stat_goods',
           noCache: true
         }
       }

@@ -8,6 +8,51 @@
         from litemall_user
         group by substr(add_time,1,10)
     </select>
+    <select id="statUserOrder" resultType="map">
+        SELECT *
+        FROM (
+        SELECT
+        u.id,
+        u.username,
+        u.nickname,
+        COUNT(o.id) AS order_count,
+
+        -- 正常订单金额
+        IFNULL(SUM(CASE WHEN o.aftersale_status != 3 AND o.order_status IN (401, 402) THEN o.actual_price ELSE 0 END), 0) AS normal_amount,
+
+        -- 退款订单金额
+        IFNULL(SUM(CASE WHEN o.aftersale_status = 3 OR o.order_status = 203 THEN o.actual_price ELSE 0 END), 0) AS refund_amount,
+
+        -- 总消费水桶数（仅 type = 0 水商品）
+        IFNULL(SUM(
+        CASE
+        WHEN o.order_status IN (401, 402) AND og.type = 0 AND o.aftersale_status !=3 THEN og.number * g.water_count
+        ELSE 0
+        END
+        ), 0) AS total_water_count
+
+        FROM litemall_user u
+        LEFT JOIN litemall_order o
+        ON u.id = o.user_id
+        AND o.order_status IN (401, 402, 203)
+
+        LEFT JOIN litemall_order_goods og
+        ON o.id = og.order_id
+        AND og.deleted = 0
+
+        LEFT JOIN litemall_goods g
+        ON og.goods_id = g.id
+        AND g.deleted = 0
+        AND g.type = 0
+        <where>
+            <if test="query != null">
+                ${query}
+            </if>
+        </where>
+        GROUP BY u.id, u.username
+        ) AS user_order_stats
+        ORDER BY user_order_stats.normal_amount DESC
+    </select>
     <select id="statOrder" resultType="map">
         select
         substr(add_time,1,10) as day,
