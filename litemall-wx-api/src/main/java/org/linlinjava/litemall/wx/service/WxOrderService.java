@@ -555,8 +555,10 @@ public class WxOrderService {
             ticketSheCount = payTicket.getTicketCount() - payTicket.getUsedCount();
         }
 
+        int type = 0;
         int ticketCount = 0;
         for (LitemallCart checkGoods : checkedGoodsList) {
+            type = checkGoods.getType();  // 类型水，checkGoods的type就全部是水
             int goodsCount;
             if (ticketSheCount > 0) {
                 if (Objects.equals(checkGoods.getGoodsId(), payTicket.getDesignatedGoodId())) {
@@ -634,6 +636,7 @@ public class WxOrderService {
         } else {
             order.setTicketCount(0);
         }
+        order.setType(type);
 
         // 有团购
         if (grouponRules != null) {

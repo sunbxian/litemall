@@ -49,9 +49,11 @@
           <el-tag>{{ statusDic[scope.row.status] }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column align="center" :label="$t('user_user.table.actions')" width="250" class-name="small-padding fixed-width">
+      <el-table-column align="center" :label="$t('user_user.table.add_time')" prop="addTime" />
+      <el-table-column align="center" :label="$t('user_user.table.actions')" width="200" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" @click="handleDetail(scope.row)">{{ $t('app.button.detail') }}</el-button>
+          <el-button type="primary" size="mini" @click="handleOrderDetail(scope.row)">订单详情</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -186,6 +188,9 @@ export default {
     handleDetail(row) {
       this.userDetail = row
       this.userDialogVisible = true
+    },
+    handleOrderDetail(row) {
+      this.$router.push({ path: '/stat/userOrderDetail', query: { id: row.id }})
     },
     handleUserUpdate() {
       updateUser(this.userDetail)

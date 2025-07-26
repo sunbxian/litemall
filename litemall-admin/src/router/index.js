@@ -550,6 +550,17 @@ export const asyncRoutes = [
         }
       },
       {
+        path: 'userOrderDetail',
+        component: () => import('@/views/stat/userOrderDetail'),
+        name: 'userOrderDetail',
+        meta: {
+          perms: ['GET /admin/stat/userOrderDetail'],
+          title: 'app.menu.stat_user_order_detail',
+          noCache: true
+        },
+        hidden: true
+      },
+      {
         path: 'grabOrder',
         component: () => import('@/views/stat/grabOrder'),
         name: 'grabOrder',
@@ -558,6 +569,17 @@ export const asyncRoutes = [
           title: 'app.menu.stat_grab_order',
           noCache: true
         }
+      },
+      {
+        path: 'grabOrderDetail',
+        component: () => import('@/views/stat/grabOrderDetail'),
+        name: 'grabOrderDetail',
+        meta: {
+          perms: ['GET /admin/stat/grabOrderDetail'],
+          title: 'app.menu.stat_grab_order_detail',
+          noCache: true
+        },
+        hidden: true
       },
       {
         path: 'goods',

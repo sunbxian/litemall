@@ -1,4 +1,5 @@
 import request from '@/utils/request'
+import Qs from 'qs'
 
 export function statUser(query) {
   return request({
@@ -32,10 +33,32 @@ export function statUserOrder(query) {
   })
 }
 
+export function userOrderDetail(query) {
+  return request({
+    url: '/stat/userOrderDetail',
+    method: 'get',
+    params: query,
+    paramsSerializer: {
+      serialize: (params) => Qs.stringify(params, { arrayFormat: 'repeat' })
+    }
+  })
+}
+
 export function statGrabOrder(query) {
   return request({
     url: '/stat/grabOrder',
     method: 'get',
     params: query
+  })
+}
+
+export function grabOrderDetail(query) {
+  return request({
+    url: '/stat/grabOrderDetail',
+    method: 'get',
+    params: query,
+    paramsSerializer: {
+      serialize: (params) => Qs.stringify(params, { arrayFormat: 'repeat' })
+    }
   })
 }

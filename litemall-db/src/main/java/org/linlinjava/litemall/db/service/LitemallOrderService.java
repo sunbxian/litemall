@@ -250,10 +250,13 @@ public class LitemallOrderService {
     }
 
 
-    public Map<String, Object> queryVoSelective(String nickname, String consignee, String orderSn, LocalDateTime start, LocalDateTime end, List<Short> orderStatusArray, Integer page, Integer limit, String sort, String order) {
-        List<String> querys = new ArrayList<>(4);
+    public Map<String, Object> queryVoSelective(String nickname, String grabName, String consignee, String orderSn, LocalDateTime start, LocalDateTime end, List<Short> orderStatusArray, List<Short> typeArray, Integer ticketCount, Integer page, Integer limit, String sort, String order) {
+        List<String> querys = new ArrayList<>();
         if (!StringUtils.isEmpty(nickname)) {
             querys.add(" u.nickname like '%" + nickname + "%' ");
+        }
+        if (!StringUtils.isEmpty(grabName)) {
+            querys.add(" u2.nickname like '%" + grabName + "%' ");
         }
         if (!StringUtils.isEmpty(consignee)) {
             querys.add(" o.consignee like '%" + consignee + "%' ");
@@ -270,6 +273,12 @@ public class LitemallOrderService {
         }
         if (orderStatusArray != null && orderStatusArray.size() > 0) {
             querys.add(" o.order_status in (" + StringUtils.collectionToDelimitedString(orderStatusArray, ",") + ") ");
+        }
+        if (typeArray != null && typeArray.size() > 0) {
+            querys.add(" o.type in (" + StringUtils.collectionToDelimitedString(typeArray, ",") + ") ");
+        }
+        if (ticketCount != null && ticketCount > 0) {
+            querys.add(" o.ticket_count >= " + ticketCount + " " );
         }
 //        querys.add(" o.deleted = 0 and og.deleted = 0 ");
         String query = StringUtils.collectionToDelimitedString(querys, "and");
@@ -301,22 +310,94 @@ public class LitemallOrderService {
         return data;
     }
 
-//    public Map<String, Object> queryVoSelective2(Integer user_id, Integer designated_id, List<Short> orderStatusArray, Integer page, Integer limit, String sort, String order) {
+    public Map<String, Object> queryVoSelectiveDetail(Integer user_id, Integer grab_user_id, String nickname, String grabName, String consignee, String orderSn, LocalDateTime start, LocalDateTime end, List<Short> orderStatusArray, List<Short> typeArray, Integer ticketCount, Integer page, Integer limit, String sort, String order) {
+        List<String> querys = new ArrayList<>();
+        if (user_id != null && user_id >= 0) {
+            querys.add(" o.user_id = " + user_id + " ");
+        }
+        if (grab_user_id != null && grab_user_id >= 0) {
+            querys.add(" o.grab_user_id = " + grab_user_id + " ");
+            querys.add(" og.type IN (0)");
+        }
+        if (!StringUtils.isEmpty(nickname)) {
+            querys.add(" u.nickname like '%" + nickname + "%' ");
+        }
+        if (!StringUtils.isEmpty(grabName)) {
+            querys.add(" u2.nickname like '%" + grabName + "%' ");
+        }
+        if (!StringUtils.isEmpty(consignee)) {
+            querys.add(" o.consignee like '%" + consignee + "%' ");
+        }
+        if (!StringUtils.isEmpty(orderSn)) {
+            querys.add(" o.order_sn = '" + orderSn + "' ");
+        }
+        DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        if (start != null) {
+            querys.add(" o.add_time >= '" + df.format(start) + "' ");
+        }
+        if (end != null) {
+            querys.add(" o.add_time < '" + df.format(end) + "' ");
+        }
+        if (orderStatusArray != null && orderStatusArray.size() > 0) {
+            querys.add(" o.order_status in (" + StringUtils.collectionToDelimitedString(orderStatusArray, ",") + ") ");
+        }
+        if (typeArray != null && typeArray.size() > 0) {
+            querys.add(" o.type in (" + StringUtils.collectionToDelimitedString(typeArray, ",") + ") ");
+        }
+        if (ticketCount != null && ticketCount > 0) {
+            querys.add(" o.ticket_count >= " + ticketCount + " " );
+        }
+//        querys.add(" o.deleted = 0 and og.deleted = 0 ");
+        String query = StringUtils.collectionToDelimitedString(querys, "and");
+        String orderByClause = null;
+        if (!StringUtils.isEmpty(sort) && !StringUtils.isEmpty(order)) {
+            orderByClause = "o." + sort + " " + order +", o.id desc ";
+        }
+
+        PageHelper.startPage(page, limit);
+        Page<Map> list1 = (Page) orderMapper.getOrderIds(query, orderByClause);
+        List<Integer> ids = new ArrayList<>();
+        for (Map map : list1) {
+            Integer id = (Integer) map.get("id");
+            ids.add(id);
+        }
+
+        List<OrderVo> list2 = new ArrayList<>();
+        if (!ids.isEmpty()) {
+            querys.add(" o.id in (" + StringUtils.collectionToDelimitedString(ids, ",") + ") ");
+            query = StringUtils.collectionToDelimitedString(querys, "and");
+            list2 = orderMapper.getOrderList(query, orderByClause);
+        }
+        Map<String, Object> data = new HashMap<String, Object>(5);
+        data.put("list", list2);
+        data.put("total", list1.getTotal());
+        data.put("page", list1.getPageNum());
+        data.put("limit", list1.getPageSize());
+        data.put("pages", list1.getPages());
+        return data;
+    }
+
+//    public Map<String, Object> queryVoSelectiveDetail(Integer user_id, Integer grab_user_id, LocalDateTime start, LocalDateTime end,  List<Short> orderStatusArray, Integer page, Integer limit, String sort, String order) {
 //        List<String> querys = new ArrayList<>();
 //
-//        if (user_id == null || user_id >= 0) {
+//        if (user_id != null && user_id >= 0) {
 //            querys.add(" o.user_id = " + user_id + " ");
 //        }
-//        if (designated_id == null || designated_id >= 0) {
-//            querys.add(" og.designated_id = " + designated_id + " ");
+//        if (grab_user_id != null && grab_user_id >= 0) {
+//            querys.add(" o.grab_user_id = " + grab_user_id + " ");
+//            querys.add(" og.type IN (0)");
 //        }
-//
 //        DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-//
+//        if (start != null) {
+//            querys.add(" o.add_time >= '" + df.format(start) + "' ");
+//        }
+//        if (end != null) {
+//            querys.add(" o.add_time < '" + df.format(end) + "' ");
+//        }
 //        if (orderStatusArray != null && orderStatusArray.size() > 0) {
 //            querys.add(" o.order_status in (" + StringUtils.collectionToDelimitedString(orderStatusArray, ",") + ") ");
 //        }
-//        querys.add(" o.deleted = 0 and og.deleted = 0 ");
+////        querys.add(" o.deleted = 0 and og.deleted = 0 ");
 //        String query = StringUtils.collectionToDelimitedString(querys, "and");
 //        String orderByClause = null;
 //        if (!StringUtils.isEmpty(sort) && !StringUtils.isEmpty(order)) {
@@ -324,7 +405,14 @@ public class LitemallOrderService {
 //        }
 //
 //        PageHelper.startPage(page, limit);
-//        Page<Map> list1 = (Page) orderMapper.getOrderIds(query, orderByClause);
+//        Page<Map> list1 = null;
+//        if (user_id != null && user_id >= 0) {
+//             list1 = (Page) orderMapper.getOrderIds(query, orderByClause);
+//        }
+//        if (grab_user_id != null && grab_user_id >= 0) {
+//            list1 = (Page) orderMapper.getGrabOrderIds(query, orderByClause);
+//        }
+//
 //        List<Integer> ids = new ArrayList<>();
 //        for (Map map : list1) {
 //            Integer id = (Integer) map.get("id");

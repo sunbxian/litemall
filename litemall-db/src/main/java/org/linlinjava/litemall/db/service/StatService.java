@@ -25,10 +25,9 @@ public class StatService {
         return statMapper.statUser();
     }
 
-    public List<Map> statOrder(LocalDateTime start, LocalDateTime end) {
+    public Map<String, Object> statOrder(LocalDateTime start, LocalDateTime end, Integer page, Integer limit) {
         List<String> querys = new ArrayList<>(2);
         DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        querys.add(" order_status IN (401, 402) ");
         if (start != null) {
             querys.add(" add_time >= '" + df.format(start) + "' " );
         }
@@ -37,7 +36,16 @@ public class StatService {
         }
         String query = StringUtils.collectionToDelimitedString(querys, "and");
 
-        return statMapper.statOrder(query);
+        PageHelper.startPage(page, limit);
+        Page<Map> list = (Page) statMapper.statOrder(query);
+
+        Map<String, Object> data = new HashMap<String, Object>(5);
+        data.put("list", list);
+        data.put("total", list.getTotal());
+        data.put("page", list.getPageNum());
+        data.put("limit", list.getPageSize());
+        data.put("pages", list.getPages());
+        return data;
     }
 
     public List<Map> statGoods() {

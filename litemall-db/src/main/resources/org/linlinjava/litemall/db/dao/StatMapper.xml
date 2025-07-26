@@ -34,7 +34,6 @@
         FROM litemall_user u
         LEFT JOIN litemall_order o
         ON u.id = o.user_id
-        AND o.order_status IN (401, 402, 203)
 
         LEFT JOIN litemall_order_goods og
         ON o.id = og.order_id
@@ -54,19 +53,44 @@
         ORDER BY user_order_stats.normal_amount DESC
     </select>
     <select id="statOrder" resultType="map">
-        select
-        substr(add_time,1,10) as day,
-        count(id) as orders,
-        count(distinct user_id) as customers,
-        sum(actual_price) as amount,
-        round(sum(actual_price)/count(distinct user_id),2) as pcr
-        from litemall_order
+        SELECT
+        DATE(o.add_time) AS order_date,
+
+        COUNT(o.id) AS order_count,  -- 订单数量
+
+        COUNT(DISTINCT o.user_id) AS user_count,  -- 下单用户数
+
+        -- 正常订单金额（已完成、未退款）
+        IFNULL(SUM(CASE
+        WHEN o.aftersale_status != 3 AND o.order_status IN (401, 402)
+        THEN o.actual_price ELSE 0
+        END), 0) AS normal_amount,
+
+        -- 退款订单金额（状态为 203 或售后完成）
+        IFNULL(SUM(CASE
+        WHEN o.aftersale_status = 3 OR o.order_status = 203
+        THEN o.actual_price ELSE 0
+        END), 0) AS refund_amount,
+
+        -- 消费水桶数（仅 type = 0 且未退款）
+        IFNULL(SUM(CASE
+        WHEN o.order_status IN (401, 402)
+        AND og.type = 0
+        AND o.aftersale_status != 3
+        THEN og.number * g.water_count
+        ELSE 0
+        END), 0) AS total_water_count
+
+        FROM litemall_order o
+        LEFT JOIN litemall_order_goods og ON o.id = og.order_id AND og.deleted = 0
+        LEFT JOIN litemall_goods g ON og.goods_id = g.id AND g.deleted = 0 AND g.type = 0
         <where>
             <if test="query != null">
                 ${query}
             </if>
         </where>
-        group by substr(add_time,1,10)
+        GROUP BY DATE(o.add_time)
+        ORDER BY order_date DESC
     </select>
     <select id="statGoods" resultType="map">
         select

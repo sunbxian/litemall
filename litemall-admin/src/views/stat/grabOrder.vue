@@ -1,7 +1,6 @@
 <template>
 
   <div class="app-container">
-
     <el-date-picker
       v-model="timeArray"
       type="datetimerange"
@@ -31,7 +30,13 @@
       <el-table-column prop="nickname" label="配送员" />
       <el-table-column prop="total_grab_orders" label="接单数" />
       <el-table-column prop="total_water_delivered" label="送水量（桶）" />
+      <el-table-column align="center" :label="$t('mall_order.table.actions')" width="200" class-name="oper">
+        <template slot-scope="scope">
+          <el-button type="primary" size="mini" @click="handleDetail(scope.row)">{{ $t('app.button.detail') }}</el-button>
+        </template>
+      </el-table-column>
     </el-table>
+
   </div>
 </template>
 
@@ -94,6 +99,9 @@ export default {
       statGrabOrder(this.listQuery).then(response => {
         this.users = response.data.data.rows
       })
+    },
+    handleDetail(row) {
+      this.$router.push({ path: '/stat/grabOrderDetail', query: { id: row.grab_user_id }})
     }
   }
 }

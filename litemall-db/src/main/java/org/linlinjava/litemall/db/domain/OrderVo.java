@@ -23,6 +23,28 @@ public class OrderVo {
     private String shipSn;
     private String message;
     private String grabName;
+    private LocalDateTime shipTime;
+    private LocalDateTime confirmTime;
+    private Integer type;
+    private Integer ticketCount;
+    private LocalDateTime payTime;
+    private List<OrderGoodsVo> goodsVoList;
+
+    public Integer getType() {
+        return type;
+    }
+
+    public void setType(Integer type) {
+        this.type = type;
+    }
+
+    public LocalDateTime getConfirmTime() {
+        return confirmTime;
+    }
+
+    public void setConfirmTime(LocalDateTime confirmTime) {
+        this.confirmTime = confirmTime;
+    }
 
     public Integer getTicketCount() {
         return ticketCount;
@@ -31,10 +53,6 @@ public class OrderVo {
     public void setTicketCount(Integer ticketCount) {
         this.ticketCount = ticketCount;
     }
-
-    private Integer ticketCount;
-    private LocalDateTime payTime;
-    private List<OrderGoodsVo> goodsVoList;
 
     public LocalDateTime getPayTime() {
         return payTime;
@@ -221,5 +239,13 @@ public class OrderVo {
                 ", goodsVoList=" + goodsVoList +
                 ", ticketCount=" + ticketCount +
                 '}';
+    }
+
+    public LocalDateTime getShipTime() {
+        return shipTime;
+    }
+
+    public void setShipTime(LocalDateTime shipTime) {
+        this.shipTime = shipTime;
     }
 }

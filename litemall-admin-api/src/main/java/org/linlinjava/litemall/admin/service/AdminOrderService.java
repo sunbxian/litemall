@@ -61,9 +61,21 @@ public class AdminOrderService {
     @Autowired
     private LitemallBottleUserService bottleUserService;
 
-    public Object list(String nickname, String consignee, String orderSn, LocalDateTime start, LocalDateTime end, List<Short> orderStatusArray,
-                       Integer page, Integer limit, String sort, String order) {
-        Map<String, Object> data = (Map)orderService.queryVoSelective(nickname, consignee, orderSn, start, end, orderStatusArray, page, limit, sort, order);
+    public Object list(String nickname, String grabName, String consignee, String orderSn, LocalDateTime start, LocalDateTime end, List<Short> orderStatusArray,
+                        List<Short>  typeArray, Integer ticketCount, Integer page, Integer limit, String sort, String order) {
+        Map<String, Object> data = (Map)orderService.queryVoSelective(nickname, grabName, consignee, orderSn, start, end, orderStatusArray, typeArray, ticketCount, page, limit, sort, order);
+        return ResponseUtil.ok(data);
+    }
+
+    public Object userOrderList(Integer userId, String nickname, String grabName, String consignee, String orderSn, LocalDateTime start, LocalDateTime end, List<Short> orderStatusArray,
+                       List<Short>  typeArray, Integer ticketCount, Integer page, Integer limit, String sort, String order) {
+        Map<String, Object> data = (Map)orderService.queryVoSelectiveDetail(userId, null, nickname, grabName, consignee, orderSn, start, end, orderStatusArray, typeArray, ticketCount, page, limit, sort, order);
+        return ResponseUtil.ok(data);
+    }
+
+    public Object grabOrderList(Integer grabUserId, String nickname, String grabName, String consignee, String orderSn, LocalDateTime start, LocalDateTime end, List<Short> orderStatusArray,
+                                List<Short>  typeArray, Integer ticketCount, Integer page, Integer limit, String sort, String order) {
+        Map<String, Object> data = (Map)orderService.queryVoSelectiveDetail(null, grabUserId,  nickname, grabName, consignee, orderSn, start, end, orderStatusArray, typeArray, ticketCount, page, limit, sort, order);
         return ResponseUtil.ok(data);
     }
 
