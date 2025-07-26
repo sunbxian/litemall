@@ -4,12 +4,17 @@
     <!-- 查询和其他操作 -->
     <div class="filter-container">
       <el-input v-model="listQuery.nickname" clearable class="filter-item" style="width: 160px;" :placeholder="$t('mall_order.placeholder.filter_nickname')" />
+      <el-input v-model="listQuery.grabName" clearable class="filter-item" style="width: 160px;" :placeholder="$t('mall_order.placeholder.filter_grab_name')" />
       <el-input v-model="listQuery.consignee" clearable class="filter-item" style="width: 160px;" :placeholder="$t('mall_order.placeholder.filter_consignee')" />
       <el-input v-model="listQuery.orderSn" clearable class="filter-item" style="width: 160px;" :placeholder="$t('mall_order.placeholder.filter_order_sn')" />
       <el-date-picker v-model="listQuery.timeArray" type="datetimerange" value-format="yyyy-MM-dd HH:mm:ss" class="filter-item" :range-separator="$t('mall_order.text.date_range_separator')" :start-placeholder="$t('mall_order.placeholder.filter_time_start')" :end-placeholder="$t('mall_order.placeholder.filter_time_end')" :picker-options="pickerOptions" />
       <el-select v-model="listQuery.orderStatusArray" multiple style="width: 200px" class="filter-item" :placeholder="$t('mall_order.placeholder.filter_order_status')">
         <el-option v-for="(key, value) in statusMap" :key="key" :label="key" :value="value" />
       </el-select>
+      <el-select v-model="listQuery.typeArray" multiple style="width: 200px" class="filter-item" :placeholder="$t('mall_order.placeholder.filter_type')">
+        <el-option v-for="(key, value) in typeMap" :key="key" :label="key" :value="value" />
+      </el-select>
+      <el-input v-model="listQuery.ticketCount" clearable class="filter-item" style="width: 160px;" :placeholder="$t('mall_order.placeholder.filter_ticket_count')" />
       <el-button v-permission="['GET /admin/order/list']" class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">{{ $t('app.button.search') }}</el-button>
       <el-button :loading="downloadLoading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">{{ $t('app.button.download') }}</el-button>
     </div>
@@ -76,7 +81,8 @@
       </el-table-column>
 
       <el-table-column align="center" :label="$t('mall_order.table.pay_time')" prop="payTime" />
-
+      <el-table-column align="center" :label="$t('mall_order.table.grabName')" prop="grabName" min-width="100" />
+      <el-table-column align="center" min-width="90" :label="$t('mall_order.table.ship_time')" prop="shipTime" />
       <el-table-column align="center" :label="$t('mall_order.table.consignee')" prop="consignee">
         <template slot-scope="scope">
           <span style="color:red; font-weight:bold;">{{ scope.row.consignee }}</span>
@@ -84,12 +90,15 @@
       </el-table-column>
 
       <el-table-column align="center" :label="$t('mall_order.table.mobile')" prop="mobile" min-width="100" />
-
-      <el-table-column align="center" :label="$t('mall_order.table.grabName')" prop="grabName" min-width="100" />
+      <el-table-column align="center" min-width="90" :label="$t('mall_order.table.confirm_time')" prop="confirmTime" />
       <!--      <el-table-column align="center" :label="$t('mall_order.table.ship_sn')" prop="shipSn" />-->
 
       <!--      <el-table-column align="center" :label="$t('mall_order.table.ship_channel')" prop="shipChannel" />-->
-
+      <el-table-column align="center" :label="$t('mall_order.table.type')" prop="type">
+        <template slot-scope="scope">
+          <el-tag>{{ scope.row.type | typeFilter }}</el-tag>
+        </template>
+      </el-table-column>
       <el-table-column align="center" :label="$t('mall_order.table.actions')" width="250" class-name="oper">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" @click="handleDetail(scope.row)">{{ $t('app.button.detail') }}</el-button>
@@ -119,6 +128,9 @@
           </el-form-item>
           <el-form-item :label="$t('mall_order.form.detail_message')">
             <span>{{ orderDetail.order.message }}</span>
+          </el-form-item>
+          <el-form-item :label="$t('mall_order.form.ticket_count')">
+            <span>{{ orderDetail.order.ticketCount }}</span>
           </el-form-item>
           <el-form-item :label="$t('mall_order.form.detail_receiving_info')">
             <span>{{ $t('mall_order.text.detail_consigne', { consignee: orderDetail.order.consignee }) }}</span>
@@ -351,12 +363,21 @@ const statusMap = {
   402: '系统收货'
 }
 
+const typeMap = {
+  0: '饮用水',
+  1: '押桶',
+  2: '水票'
+}
+
 export default {
   name: 'Order',
   components: { Pagination },
   filters: {
     orderStatusFilter(status) {
       return statusMap[status]
+    },
+    typeFilter(type) {
+      return typeMap[type]
     }
   },
   data() {
@@ -368,10 +389,13 @@ export default {
         page: 1,
         limit: 20,
         nickname: undefined,
+        grabName: undefined,
         consignee: undefined,
         orderSn: undefined,
         timeArray: [],
         orderStatusArray: [],
+        typeArray: [],
+        ticketCount: '',
         sort: 'add_time',
         order: 'desc'
       },
@@ -403,6 +427,7 @@ export default {
         }]
       },
       statusMap,
+      typeMap,
       orderDialogVisible: false,
       orderDetail: {
         order: {},
@@ -443,10 +468,22 @@ export default {
     }
   },
   created() {
+    this.init()
     this.getList()
     this.getChannel()
   },
   methods: {
+    init: function() {
+      if (this.$route.query.order_date == null) {
+
+      } else {
+        const order_date = this.$route.query.order_date
+        const start_date = order_date + ' 00:00:00'
+        const end_date = order_date + ' 23:59:59'
+        this.listQuery.timeArray.push(start_date)
+        this.listQuery.timeArray.push(end_date)
+      }
+    },
     checkPermission,
     getList() {
       this.listLoading = true
